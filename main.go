@@ -8,11 +8,13 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kong"
+	"github.com/kklipsch/billy-bot/pkg/openrouter"
 	"github.com/kklipsch/billy-bot/pkg/smee"
 )
 
 type CLI struct {
-	Smee smee.Command `cmd:"smee" help:"Run the Smee client to receive webhook events."`
+	Smee       smee.Command       `cmd:"smee" help:"Run the Smee client to receive webhook events."`
+	OpenRouter openrouter.Command `cmd:"openrouter" help:"Send requests to OpenRouter AI models."`
 }
 
 func main() {
