@@ -11,7 +11,7 @@ import (
 
 // Command represents the CLI command for Smee
 type Command struct {
-	URL string `arg:"" optional:"" help:"The Smee.io URL to subscribe to. If not provided, a new channel will be created."`
+	URL string `arg:"" optional:"" help:"The Smee.io URL to subscribe to. If not provided, checks SMEE_SOURCE env var, then creates a new channel if needed."`
 }
 
 // Run executes the Smee command
@@ -21,16 +21,31 @@ func (s *Command) Run(ctx context.Context) error {
 		err    error
 	)
 
+	// Check command line argument first
 	if s.URL != "" {
 		source = s.URL
 	} else {
-		source, err = CreateChannel()
-		if err != nil {
-			return err
+		// Then check environment variable
+		envSource := os.Getenv("SMEE_SOURCE")
+		if envSource != "" {
+			source = envSource
+		} else {
+			// Finally create a new channel if needed
+			source, err = CreateChannel()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	fmt.Println("Subscribing to smee source: " + source)
+	// Log the source of the Smee URL
+	if s.URL != "" {
+		fmt.Println("Subscribing to smee source (from command line): " + source)
+	} else if os.Getenv("SMEE_SOURCE") != "" {
+		fmt.Println("Subscribing to smee source (from SMEE_SOURCE env var): " + source)
+	} else {
+		fmt.Println("Subscribing to smee source (newly created): " + source)
+	}
 
 	events, err := OpenSSEUrl(ctx, source)
 	if err != nil {
