@@ -1,0 +1,44 @@
+{
+	"name": "Go",
+	"image": "mcr.microsoft.com/devcontainers/go:1-bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/git:1": {
+			"version": "latest",
+			"ppa": "false"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"go.toolsManagement.checkForUpdates": "local",
+				"go.useLanguageServer": true,
+				"go.gopath": "/go",
+				"go.lintTool": "golangci-lint",
+				"go.formatTool": "gofmt",
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": true 
+				}
+			},
+			"extensions": [
+				"golang.go",
+				"ms-vscode.go",
+				"github.copilot",
+				"github.vscode-github-actions",
+				"github.vscode-pull-request-github"
+			]
+		}
+	},
+	"remoteUser": "vscode",
+	"postCreateCommand": "go version && go install golang.org/x/tools/gopls@latest && go install github.com/go-delve/delve/cmd/dlv@latest && go install honnef.co/go/tools/cmd/staticcheck@latest",
+	"mounts": [
+		{
+			"source": "go-volumes-${devcontainerId}",
+			"target": "/go",
+			"type": "volume"
+		}
+	]
+}
