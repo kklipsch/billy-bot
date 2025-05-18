@@ -2,42 +2,28 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/alecthomas/kong"
 )
 
+type CLI struct {
+	Smee SmeeCmd `cmd:"" help:"Run the Smee client to receive webhook events."`
+}
+
 func main() {
-	var source *string
-	var err error
-	if len(os.Args) > 1 {
-		source = &os.Args[1]
-	} else {
-		source, err = CreateSmeeChannel()
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	fmt.Println("Subscribing to smee source: " + *source)
-
-	logger := log.Logger{}
-
-	target := make(chan SSEvent)
-	client := NewSmeeClient(source, target, &logger)
-
-	fmt.Println("Client initialised")
-
-	sub, err := client.Start()
+	var cli CLI
+	ctx := kong.Parse(&cli,
+		kong.Name("billy-bot"),
+		kong.Description("The _worst_ code bot."),
+		kong.UsageOnError(),
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact: true,
+		}),
+	)
+	err := ctx.Run()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
-
-	fmt.Println("Client running")
-
-	for ev := range target {
-		// do what you want with the event
-		fmt.Printf("Received event: id=%v, name=%v, payload=%v\n", ev.Id, ev.Name, string(ev.Data))
-	}
-
-	sub.Stop()
 }

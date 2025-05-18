@@ -9,6 +9,49 @@ import (
 	"os"
 )
 
+type SmeeCmd struct {
+	URL string `arg:"" optional:"" help:"The Smee.io URL to subscribe to. If not provided, a new channel will be created."`
+}
+
+// Run executes the smee subcommand
+func (s *SmeeCmd) Run() error {
+	var source *string
+	var err error
+
+	if s.URL != "" {
+		source = &s.URL
+	} else {
+		source, err = CreateSmeeChannel()
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Subscribing to smee source: " + *source)
+
+	logger := log.Logger{}
+
+	target := make(chan SSEvent)
+	client := NewSmeeClient(source, target, &logger)
+
+	fmt.Println("Client initialised")
+
+	sub, err := client.Start()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Client running")
+
+	for ev := range target {
+		// do what you want with the event
+		fmt.Printf("Received event: id=%v, name=%v, payload=%v\n", ev.Id, ev.Name, string(ev.Data))
+	}
+
+	sub.Stop()
+	return nil
+}
+
 // SmeeClient handles the connection to a Smee.io channel
 type SmeeClient struct {
 	source *string
