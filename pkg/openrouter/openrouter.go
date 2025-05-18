@@ -13,7 +13,7 @@ import (
 // Command represents the CLI command for OpenRouter
 type Command struct {
 	Prompt string `arg:"" help:"The prompt to send to the AI model."`
-	Model  string `default:"openai/gpt-3.5-turbo" help:"The model to use."`
+	Model  string `default:"openrouter/auto" help:"The model to use."`
 	APIKey string `name:"api-key" short:"k" help:"OpenRouter API key. If not provided, OPENROUTER_API_KEY env var is used."`
 }
 
