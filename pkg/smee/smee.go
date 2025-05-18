@@ -1,4 +1,4 @@
-package main
+package smee
 
 import (
 	"bufio"
@@ -9,19 +9,20 @@ import (
 	"os"
 )
 
-type SmeeCmd struct {
+// Command represents the CLI command for Smee
+type Command struct {
 	URL string `arg:"" optional:"" help:"The Smee.io URL to subscribe to. If not provided, a new channel will be created."`
 }
 
-// Run executes the smee subcommand
-func (s *SmeeCmd) Run() error {
+// Run executes the Smee command
+func (s *Command) Run() error {
 	var source *string
 	var err error
 
 	if s.URL != "" {
 		source = &s.URL
 	} else {
-		source, err = CreateSmeeChannel()
+		source, err = CreateChannel()
 		if err != nil {
 			return err
 		}
@@ -31,8 +32,8 @@ func (s *SmeeCmd) Run() error {
 
 	logger := log.Logger{}
 
-	target := make(chan SSEvent)
-	client := NewSmeeClient(source, target, &logger)
+	target := make(chan Event)
+	client := NewClient(source, target, &logger)
 
 	fmt.Println("Client initialised")
 
@@ -52,22 +53,22 @@ func (s *SmeeCmd) Run() error {
 	return nil
 }
 
-// SmeeClient handles the connection to a Smee.io channel
-type SmeeClient struct {
+// Client handles the connection to a Smee.io channel
+type Client struct {
 	source *string
-	target chan<- SSEvent
+	target chan<- Event
 	logger *log.Logger
 }
 
-// SSEvent represents a Server-Sent Event from Smee.io
-type SSEvent struct {
+// Event represents a Server-Sent Event from Smee.io
+type Event struct {
 	Id   string
 	Name string
 	Data []byte
 }
 
-// CreateSmeeChannel creates a new Smee.io channel and returns its URL
-func CreateSmeeChannel() (*string, error) {
+// CreateChannel creates a new Smee.io channel and returns its URL
+func CreateChannel() (*string, error) {
 	httpClient := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -82,9 +83,9 @@ func CreateSmeeChannel() (*string, error) {
 	return &loc, nil
 }
 
-// NewSmeeClient creates a new SmeeClient
-func NewSmeeClient(source *string, target chan<- SSEvent, logger *log.Logger) *SmeeClient {
-	c := new(SmeeClient)
+// NewClient creates a new Client
+func NewClient(source *string, target chan<- Event, logger *log.Logger) *Client {
+	c := new(Client)
 	c.source = source
 	c.target = target
 	c.logger = logger
@@ -92,7 +93,7 @@ func NewSmeeClient(source *string, target chan<- SSEvent, logger *log.Logger) *S
 }
 
 // Start begins listening for events from the Smee.io channel
-func (c *SmeeClient) Start() (*SmeeClientSubscription, error) {
+func (c *Client) Start() (*Subscription, error) {
 	eventStream, err := OpenSSEUrl(*c.source)
 	if err != nil {
 		return nil, err
@@ -101,10 +102,10 @@ func (c *SmeeClient) Start() (*SmeeClientSubscription, error) {
 	quit := make(chan interface{})
 	go c.run(eventStream, quit)
 
-	return &SmeeClientSubscription{terminator: quit}, nil
+	return &Subscription{terminator: quit}, nil
 }
 
-func (c *SmeeClient) run(sseEventStream <-chan SSEvent, quit <-chan interface{}) {
+func (c *Client) run(sseEventStream <-chan Event, quit <-chan interface{}) {
 	for {
 		select {
 		case event := <-sseEventStream:
@@ -115,18 +116,18 @@ func (c *SmeeClient) run(sseEventStream <-chan SSEvent, quit <-chan interface{})
 	}
 }
 
-// SmeeClientSubscription represents an active subscription to a Smee.io channel
-type SmeeClientSubscription struct {
+// Subscription represents an active subscription to a Smee.io channel
+type Subscription struct {
 	terminator chan<- interface{}
 }
 
 // Stop terminates the subscription to the Smee.io channel
-func (c *SmeeClientSubscription) Stop() {
+func (c *Subscription) Stop() {
 	c.terminator <- nil
 }
 
 // OpenSSEUrl opens a connection to a Server-Sent Events endpoint
-func OpenSSEUrl(url string) (<-chan SSEvent, error) {
+func OpenSSEUrl(url string) (<-chan Event, error) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accept", "text/event-stream")
@@ -143,12 +144,12 @@ func OpenSSEUrl(url string) (<-chan SSEvent, error) {
 		return nil, fmt.Errorf("Error: invalid Content-Type == %s\n", resp.Header.Get("Content-Type"))
 	}
 
-	events := make(chan SSEvent)
+	events := make(chan Event)
 
 	var buf bytes.Buffer
 
 	go func() {
-		ev := SSEvent{}
+		ev := Event{}
 		scanner := bufio.NewScanner(resp.Body)
 
 		for scanner.Scan() {
@@ -173,7 +174,7 @@ func OpenSSEUrl(url string) (<-chan SSEvent, error) {
 				ev.Data = buf.Bytes()
 				buf.Reset()
 				events <- ev
-				ev = SSEvent{}
+				ev = Event{}
 
 			default:
 				fmt.Fprintf(os.Stderr, "Error during EventReadLoop - Default triggerd! len:%d\n%s", len(line), line)
@@ -185,7 +186,6 @@ func OpenSSEUrl(url string) (<-chan SSEvent, error) {
 		if err = scanner.Err(); err != nil {
 			fmt.Fprintf(os.Stderr, "Error during resp.Body read:%s\n", err)
 			close(events)
-
 		}
 	}()
 

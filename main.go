@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/kklipsch/billy-bot/pkg/smee"
 )
 
 type CLI struct {
-	Smee SmeeCmd `cmd:"" help:"Run the Smee client to receive webhook events."`
+	Smee smee.Command `cmd:"smee" help:"Run the Smee client to receive webhook events."`
 }
 
 func main() {
