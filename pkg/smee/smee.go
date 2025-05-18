@@ -3,8 +3,8 @@ package smee
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 )
@@ -15,12 +15,14 @@ type Command struct {
 }
 
 // Run executes the Smee command
-func (s *Command) Run() error {
-	var source *string
-	var err error
+func (s *Command) Run(ctx context.Context) error {
+	var (
+		source string
+		err    error
+	)
 
 	if s.URL != "" {
-		source = &s.URL
+		source = s.URL
 	} else {
 		source, err = CreateChannel()
 		if err != nil {
@@ -28,36 +30,19 @@ func (s *Command) Run() error {
 		}
 	}
 
-	fmt.Println("Subscribing to smee source: " + *source)
+	fmt.Println("Subscribing to smee source: " + source)
 
-	logger := log.Logger{}
-
-	target := make(chan Event)
-	client := NewClient(source, target, &logger)
-
-	fmt.Println("Client initialised")
-
-	sub, err := client.Start()
+	events, err := OpenSSEUrl(ctx, source)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Client running")
-
-	for ev := range target {
+	for ev := range events {
 		// do what you want with the event
 		fmt.Printf("Received event: id=%v, name=%v, payload=%v\n", ev.Id, ev.Name, string(ev.Data))
 	}
 
-	sub.Stop()
 	return nil
-}
-
-// Client handles the connection to a Smee.io channel
-type Client struct {
-	source *string
-	target chan<- Event
-	logger *log.Logger
 }
 
 // Event represents a Server-Sent Event from Smee.io
@@ -68,7 +53,7 @@ type Event struct {
 }
 
 // CreateChannel creates a new Smee.io channel and returns its URL
-func CreateChannel() (*string, error) {
+func CreateChannel() (string, error) {
 	httpClient := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -76,61 +61,19 @@ func CreateChannel() (*string, error) {
 	}
 	resp, err := httpClient.Head("https://smee.io/new")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	loc := resp.Header.Get("Location")
-	return &loc, nil
-}
-
-// NewClient creates a new Client
-func NewClient(source *string, target chan<- Event, logger *log.Logger) *Client {
-	c := new(Client)
-	c.source = source
-	c.target = target
-	c.logger = logger
-	return c
-}
-
-// Start begins listening for events from the Smee.io channel
-func (c *Client) Start() (*Subscription, error) {
-	eventStream, err := OpenSSEUrl(*c.source)
-	if err != nil {
-		return nil, err
-	}
-
-	quit := make(chan interface{})
-	go c.run(eventStream, quit)
-
-	return &Subscription{terminator: quit}, nil
-}
-
-func (c *Client) run(sseEventStream <-chan Event, quit <-chan interface{}) {
-	for {
-		select {
-		case event := <-sseEventStream:
-			c.target <- event
-		case <-quit:
-			return
-		}
-	}
-}
-
-// Subscription represents an active subscription to a Smee.io channel
-type Subscription struct {
-	terminator chan<- interface{}
-}
-
-// Stop terminates the subscription to the Smee.io channel
-func (c *Subscription) Stop() {
-	c.terminator <- nil
+	return loc, nil
 }
 
 // OpenSSEUrl opens a connection to a Server-Sent Events endpoint
-func OpenSSEUrl(url string) (<-chan Event, error) {
+func OpenSSEUrl(ctx context.Context, url string) (<-chan Event, error) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accept", "text/event-stream")
+	req = req.WithContext(ctx)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -179,11 +122,13 @@ func OpenSSEUrl(url string) (<-chan Event, error) {
 			default:
 				fmt.Fprintf(os.Stderr, "Error during EventReadLoop - Default triggerd! len:%d\n%s", len(line), line)
 				close(events)
-
 			}
 		}
 
-		if err = scanner.Err(); err != nil {
+		err := scanner.Err()
+		if err == ctx.Err() {
+			close(events)
+		} else if err != nil {
 			fmt.Fprintf(os.Stderr, "Error during resp.Body read:%s\n", err)
 			close(events)
 		}
