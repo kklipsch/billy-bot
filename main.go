@@ -17,11 +17,11 @@ import (
 )
 
 type CLI struct {
-	Smee       smee.Command       `cmd:"smee" help:"Run the Smee client to receive webhook events."`
-	OpenRouter openrouter.Command `cmd:"openrouter" help:"Send requests to OpenRouter AI models."`
+	Smee       smee.Command        `cmd:"smee" help:"Run the Smee client to receive webhook events."`
+	OpenRouter openrouter.Frinkiac `cmd:"openrouter" help:"Send requests to OpenRouter AI models."`
 
 	EnvFile  string `default:".env" name:"env-file" short:"e" help:"Path to the .env file to load. Defaults to .env in the current directory. Set explicitly to empty to skip loading."`
-	LogLevel string `default:"trace" name:"log-level" short:"l" help:"Set the log level. Options: debug, info, warn, error, fatal, panic. Defaults to info."`
+	LogLevel string `default:"warn" name:"log-level" short:"l" help:"Set the log level. Options: debug, info, warn, error, fatal, panic. Defaults to info."`
 }
 
 func main() {

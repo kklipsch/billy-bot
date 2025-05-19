@@ -59,7 +59,18 @@ type ChatMessage struct {
 		have seen fields refusal and reasoning but dont know the type
 		as we've only received nulls
 	*/
+	FinishReason       string       `json:"finish_reason,omitempty"`
+	NativeFinishReason string       `json:"native_finish_reason,omitempty"`
+	Index              int          `json:"index,omitempty"`
+	Message            *ChatMessage `json:"message,omitempty"`
+	ToolCalls          []ToolCall   `json:"tool_calls,omitempty"`
+}
 
+type ToolCall struct {
+	Index    int       `json:"index,omitempty"`
+	ID       string    `json:"id,omitempty"`
+	Type     string    `json:"type,omitempty"`
+	Function *Function `json:"function,omitempty"`
 }
 
 type ProviderRequest struct {

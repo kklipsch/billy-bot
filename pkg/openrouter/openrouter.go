@@ -72,8 +72,8 @@ func FromResponse[T any](ctx context.Context, resp *http.Response, err error, al
 		return
 	}
 
-	if err = json.Unmarshal(body, &oresp.Result); err != nil {
-		oresp.Err = fmt.Errorf("error unmarshaling response: %w", err)
+	if err = json.Unmarshal([]byte(strbody), &oresp.Result); err != nil {
+		oresp.Err = fmt.Errorf("error unmarshaling response: %w %s", err, strbody)
 	}
 
 	return oresp

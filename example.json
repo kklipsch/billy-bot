@@ -1,0 +1,44 @@
+{
+  "id": "gen-1747695328-FNYmRMTd25sii4nMJO63",
+  "provider": "Azure",
+  "model": "openai/gpt-4o-2024-08-06",
+  "object": "chat.completion",
+  "created": 1747695329,
+  "choices": [
+    {
+      "logprobs": null,
+      "finish_reason": "tool_calls",
+      "native_finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The quote \"I'm in danger\" is famously said by Ralph Wiggum in The Simpsons. Let's find some relevant scenes using this quote.",
+        "refusal": null,
+        "reasoning": null,
+        "tool_calls": [
+          {
+            "function": {
+              "name": "frinkiac",
+              "arguments": "{\"confidence\":1.0,\"quote\":\"I'm in danger\"}"
+            },
+            "id": "call_VLViFYQ0T9SFWiC03W6OgzIG",
+            "index": 0,
+            "type": "function"
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp_5d58a6052a",
+  "usage": {
+    "prompt_tokens": 218,
+    "completion_tokens": 54,
+    "total_tokens": 272,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    }
+  }
+}

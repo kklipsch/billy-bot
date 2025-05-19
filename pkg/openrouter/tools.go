@@ -16,6 +16,7 @@ type Tool struct {
 type Function struct {
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
+	Arguments   string     `json:"arguments"`
 	Parameters  Parameters `json:"parameters"`
 }
 
