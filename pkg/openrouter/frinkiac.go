@@ -25,6 +25,10 @@ var (
 						Type:        "number",
 						Description: "The confidence score of the quote.",
 					},
+					"character": {
+						Type:        "string",
+						Description: "The character who said the quote.",
+					},
 					"season": {
 						Type:        "integer",
 						Description: "The season number.",
@@ -42,7 +46,7 @@ var (
 	FrinkiacPrompt = ChatMessage{
 		Role: "system",
 		Content: `You are a helpful assistant with encyclopedic knowledge of The Simpsons. 
-		You have access to a tool called frinkiac that can find scenes from the Simppsons based on quotes.
+		You have access to a tool called frinkiac that can find scenes from the Simppsons based on the text used in closed captioning of the Simpsons.
 		Your goal is to categorize a set of text and think of any Simpsons quotes that are relevant to the text.
 		Your output should be a list JSON objects with a confidence score from 0 to 1.0 and a quote that is a good search term for the frinkiac tool.
 		If you can identify the season and episode number, include those as well.

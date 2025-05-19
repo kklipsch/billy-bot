@@ -1,9 +1,9 @@
 {
-  "id": "gen-1747695328-FNYmRMTd25sii4nMJO63",
-  "provider": "Azure",
-  "model": "openai/gpt-4o-2024-08-06",
+  "id": "gen-1747696169-RsogLWMVccow23cR3ve1",
+  "provider": "OpenAI",
+  "model": "openai/gpt-4o-mini-2024-07-18",
   "object": "chat.completion",
-  "created": 1747695329,
+  "created": 1747696170,
   "choices": [
     {
       "logprobs": null,
@@ -12,28 +12,46 @@
       "index": 0,
       "message": {
         "role": "assistant",
-        "content": "The quote \"I'm in danger\" is famously said by Ralph Wiggum in The Simpsons. Let's find some relevant scenes using this quote.",
+        "content": "",
         "refusal": null,
         "reasoning": null,
         "tool_calls": [
           {
+            "index": 0,
+            "id": "call_TXx2bx6hKSAx5U0klLY9ibu9",
+            "type": "function",
             "function": {
               "name": "frinkiac",
-              "arguments": "{\"confidence\":1.0,\"quote\":\"I'm in danger\"}"
-            },
-            "id": "call_VLViFYQ0T9SFWiC03W6OgzIG",
-            "index": 0,
-            "type": "function"
+              "arguments": "{\"quote\": \"looking very classy\", \"confidence\": 0.8}"
+            }
+          },
+          {
+            "index": 1,
+            "id": "call_NnKfNNC8ukrYzQO38gr6a1g9",
+            "type": "function",
+            "function": {
+              "name": "frinkiac",
+              "arguments": "{\"quote\": \"classy\", \"confidence\": 0.7}"
+            }
+          },
+          {
+            "index": 2,
+            "id": "call_VLMsQudUzfJxzKYsIbWHTw6B",
+            "type": "function",
+            "function": {
+              "name": "frinkiac",
+              "arguments": "{\"quote\": \"classy outfit\", \"confidence\": 0.6}"
+            }
           }
         ]
       }
     }
   ],
-  "system_fingerprint": "fp_5d58a6052a",
+  "system_fingerprint": "fp_54eb4bd693",
   "usage": {
-    "prompt_tokens": 218,
-    "completion_tokens": 54,
-    "total_tokens": 272,
+    "prompt_tokens": 234,
+    "completion_tokens": 84,
+    "total_tokens": 318,
     "prompt_tokens_details": {
       "cached_tokens": 0
     },
