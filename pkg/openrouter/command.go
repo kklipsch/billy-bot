@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
+
+	"github.com/kklipsch/billy-bot/pkg/config"
 )
 
 // Command represents the CLI command for OpenRouter
@@ -16,16 +17,9 @@ type Command struct {
 
 // Run executes the OpenRouter command
 func (o *Command) Run(ctx context.Context) error {
-	// Get API key from flag or environment variable
-	apiKey := o.APIKey
-	if apiKey == "" {
-		apiKey = os.Getenv("OPENROUTER_API_KEY")
-		if apiKey == "" {
-			return fmt.Errorf("API key not provided and OPENROUTER_API_KEY environment variable not set")
-		}
-		fmt.Println("Using API key from OPENROUTER_API_KEY environment variable")
-	} else {
-		fmt.Println("Using API key from command line flag")
+	apiKey, err := config.GetFlagOrEnvVar(o.APIKey, "OPENROUTER_API_KEY")
+	if err != nil {
+		return err
 	}
 
 	fmt.Printf("Sending prompt to %s: %s\n", o.Model, o.Prompt)
