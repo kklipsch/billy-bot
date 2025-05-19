@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kong"
+	"github.com/joho/godotenv"
 	"github.com/kklipsch/billy-bot/pkg/openrouter"
 	"github.com/kklipsch/billy-bot/pkg/smee"
 )
@@ -15,12 +16,16 @@ import (
 type CLI struct {
 	Smee       smee.Command       `cmd:"smee" help:"Run the Smee client to receive webhook events."`
 	OpenRouter openrouter.Command `cmd:"openrouter" help:"Send requests to OpenRouter AI models."`
+
+	EnvFile string `default:".env" name:"env-file" short:"e" help:"Path to the .env file to load. Defaults to .env in the current directory. Set explicitly to empty to skip loading."`
 }
 
 func main() {
 	ctx := signalContext()
 
-	k := kong.Parse(&CLI{},
+	cli := CLI{}
+
+	k := kong.Parse(&cli,
 		kong.Name("billy-bot"),
 		kong.Description("The _worst_ code bot."),
 		kong.UsageOnError(),
@@ -29,6 +34,13 @@ func main() {
 		}),
 		kong.BindTo(ctx, (*context.Context)(nil)),
 	)
+
+	if cli.EnvFile != "" {
+		if err := godotenv.Load(cli.EnvFile); err != nil {
+			fmt.Printf("Error loading .env file: %v\n", err)
+			os.Exit(1)
+		}
+	}
 
 	err := k.Run()
 	if err != nil {

@@ -51,8 +51,44 @@ type ChatMessage struct {
 
 // OpenRouterRequest represents a request to the OpenRouter API
 type OpenRouterRequest struct {
-	Model    string        `json:"model"`
-	Messages []ChatMessage `json:"messages"`
+	Model      string        `json:"model"`
+	Messages   []ChatMessage `json:"messages"`
+	Tools      []Tool        `json:"tools,omitempty"`
+	ToolChoice string        `json:"tool_choice,omitempty"`
+}
+
+type Tool struct {
+	Type     string   `json:"type"`
+	Function Function `json:"function"`
+}
+
+// Function represents a function that can be called by the model
+type Function struct {
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Parameters  Parameters `json:"parameters"`
+}
+
+// Parameters defines the schema for function parameters
+type Parameters struct {
+	Type       string              `json:"type"`
+	Properties map[string]Property `json:"properties"`
+	Required   []string            `json:"required,omitempty"`
+}
+
+// Property defines a property in a parameter schema
+type Property struct {
+	Type        string   `json:"type"`
+	Description string   `json:"description"`
+	Enum        []string `json:"enum,omitempty"`
+}
+
+// ToolChoice specifies how the model should use tools
+type ToolChoice struct {
+	Type     string `json:"type,omitempty"`
+	Function struct {
+		Name string `json:"name,omitempty"`
+	} `json:"function,omitempty"`
 }
 
 // OpenRouterResponse represents a response from the OpenRouter API
@@ -74,6 +110,30 @@ func (o *Command) callOpenRouter(ctx context.Context, apiKey, model, prompt stri
 				Content: prompt,
 			},
 		},
+		Tools: []Tool{
+			{
+				Type: "function",
+				Function: Function{
+					Name:        "get_code",
+					Description: "Get code from a file",
+					Parameters: Parameters{
+						Type: "object",
+						Properties: map[string]Property{
+							"file_path": {
+								Type:        "string",
+								Description: "Path to the file",
+							},
+							"line_number": {
+								Type:        "integer",
+								Description: "Line number to retrieve",
+							},
+						},
+						Required: []string{"file_path", "line_number"},
+					},
+				},
+			},
+		},
+		ToolChoice: "auto",
 	}
 
 	requestJSON, err := json.Marshal(requestData)
@@ -113,8 +173,10 @@ func (o *Command) callOpenRouter(ctx context.Context, apiKey, model, prompt stri
 	}
 
 	if len(openRouterResp.Choices) == 0 {
-		return "", fmt.Errorf("OpenRouter API returned no choices")
+		return "", fmt.Errorf("OpenRouter API returned no choices: %d %s", resp.StatusCode, string(body))
 	}
+
+	fmt.Println(string(body))
 
 	return openRouterResp.Choices[0].Message.Content, nil
 }
