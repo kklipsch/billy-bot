@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"slices"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 func OpenRouterCall[T any](ctx context.Context, apiKey string, req *http.Request, err error, allowedStatus ...int) Response[T] {
@@ -29,8 +30,7 @@ func NewRequest(ctx context.Context, method string, endpoint string, body any) (
 
 	url := fmt.Sprintf("https://openrouter.ai/api/v1/%s", endpoint)
 
-	log.Printf("sending to openrouter: %s %s", method, url)
-	log.Printf("request body: %s", string(requestJSON))
+	log.Debug().Str("url", url).Str("method", method).Bytes("body", requestJSON).Msg("sending to openrouter")
 
 	return http.NewRequestWithContext(ctx, method, url, strings.NewReader(string(requestJSON)))
 }
@@ -64,7 +64,7 @@ func FromResponse[T any](ctx context.Context, resp *http.Response, err error, al
 	defer resp.Body.Close()
 
 	strbody := strings.TrimSpace(string(body))
-	log.Printf("response from openrouter (%d): %s", resp.StatusCode, strbody)
+	log.Debug().Int("status", resp.StatusCode).Str("body", strbody).Msg("response from openrouter")
 	oresp.Body = strbody
 
 	if !slices.Contains(allowedStatus, resp.StatusCode) {

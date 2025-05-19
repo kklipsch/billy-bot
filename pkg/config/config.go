@@ -2,19 +2,22 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 func GetFlagOrEnvVar(val string, key string) (string, error) {
+	logger := log.Trace().Str("key", key)
+
 	if val != "" {
-		log.Printf("using %s from command line flag", key)
+		logger.Msg("using flag value")
 		return val, nil
 	}
 
 	result := os.Getenv(key)
 	if result != "" {
-		log.Printf("using %s from environment variable", key)
+		logger.Msg("using environment variable")
 		return result, nil
 	}
 
