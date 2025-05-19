@@ -1,10 +1,7 @@
 package openrouter
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -17,12 +14,7 @@ type CompletionRequest struct {
 }
 
 func NewCompletionReq(ctx context.Context, request ChatCompletionRequest) (*http.Request, error) {
-	requestJSON, err := json.Marshal(request)
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling completions request: %w", err)
-	}
-
-	return http.NewRequestWithContext(ctx, "POST", "https://openrouter.ai/api/v1/completions", bytes.NewBuffer(requestJSON))
+	return NewRequest(ctx, "POST", "completions", request)
 }
 
 // per https://openrouter.ai/docs/api-reference/chat-completion 2025-05-19
@@ -35,12 +27,7 @@ type ChatCompletionRequest struct {
 }
 
 func NewChatCompletionReq(ctx context.Context, request ChatCompletionRequest) (*http.Request, error) {
-	requestJSON, err := json.Marshal(request)
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling chat completion request: %w", err)
-	}
-
-	return http.NewRequestWithContext(ctx, "POST", "https://openrouter.ai/api/v1/chat/completions", bytes.NewBuffer(requestJSON))
+	return NewRequest(ctx, "POST", "chat/completions", request)
 }
 
 type BaseRequest struct {

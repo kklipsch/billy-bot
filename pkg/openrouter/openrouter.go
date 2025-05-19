@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"slices"
 	"strings"
@@ -18,6 +19,20 @@ func OpenRouterCall[T any](ctx context.Context, apiKey string, req *http.Request
 	AddDefaultHeaders(apiKey, req)
 	resp, err := http.DefaultClient.Do(req)
 	return FromResponse[T](ctx, resp, err, allowedStatus...)
+}
+
+func NewRequest(ctx context.Context, method string, endpoint string, body any) (*http.Request, error) {
+	requestJSON, err := json.Marshal(body)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling request for %s: %w", endpoint, err)
+	}
+
+	url := fmt.Sprintf("https://openrouter.ai/api/v1/%s", endpoint)
+
+	log.Printf("sending to openrouter: %s %s", method, url)
+	log.Printf("request body: %s", string(requestJSON))
+
+	return http.NewRequestWithContext(ctx, method, url, strings.NewReader(string(requestJSON)))
 }
 
 func AddDefaultHeaders(APIKey string, req *http.Request) {
@@ -48,7 +63,9 @@ func FromResponse[T any](ctx context.Context, resp *http.Response, err error, al
 	}
 	defer resp.Body.Close()
 
-	oresp.Body = strings.TrimSpace(string(body))
+	strbody := strings.TrimSpace(string(body))
+	log.Printf("response from openrouter (%d): %s", resp.StatusCode, strbody)
+	oresp.Body = strbody
 
 	if !slices.Contains(allowedStatus, resp.StatusCode) {
 		oresp.Err = fmt.Errorf("unexpected status code: %d", resp.StatusCode)

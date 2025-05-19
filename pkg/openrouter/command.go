@@ -2,7 +2,6 @@ package openrouter
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/kklipsch/billy-bot/pkg/config"
@@ -21,8 +20,6 @@ func (o *Command) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("Sending prompt to %s: %s\n", o.Model, o.Prompt)
 
 	request := ChatCompletionRequest{
 		Model:    o.Model,
@@ -57,11 +54,8 @@ func (o *Command) Run(ctx context.Context) error {
 
 	req, err := NewChatCompletionReq(ctx, request)
 	result := OpenRouterCall[ChatCompletionResponse](ctx, apiKey, req, err, http.StatusOK)
-
-	fmt.Println("Response from OpenRouter:")
-	fmt.Println(result.Body)
 	if result.Err != nil {
-		return fmt.Errorf("error: %w", result.Err)
+		return result.Err
 	}
 
 	return nil
