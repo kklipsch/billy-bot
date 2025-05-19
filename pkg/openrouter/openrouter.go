@@ -1,12 +1,12 @@
 package openrouter
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+<<<<<<< HEAD
 	"os"
 )
 
@@ -137,46 +137,60 @@ func (o *Command) callOpenRouter(ctx context.Context, apiKey, model, prompt stri
 	}
 
 	requestJSON, err := json.Marshal(requestData)
+=======
+	"slices"
+	"strings"
+)
+
+func OpenRouterCall[T any](ctx context.Context, apiKey string, req *http.Request, err error, allowedStatus ...int) Response[T] {
+>>>>>>> 9de49fa (move command into its own fiel)
 	if err != nil {
-		return "", fmt.Errorf("error marshaling request: %w", err)
+		return Response[T]{Err: fmt.Errorf("error creating request: %w", err)}
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", "https://openrouter.ai/api/v1/chat/completions", bytes.NewBuffer(requestJSON))
-	if err != nil {
-		return "", fmt.Errorf("error creating request: %w", err)
-	}
+	AddDefaultHeaders(apiKey, req)
+	resp, err := http.DefaultClient.Do(req)
+	return FromResponse[T](ctx, resp, err, allowedStatus...)
+}
 
+func AddDefaultHeaders(APIKey string, req *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Authorization", "Bearer "+APIKey)
 	req.Header.Set("HTTP-Referer", "https://github.com/kklipsch/billy-bot")
 	req.Header.Set("X-Title", "Billy Bot")
+}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+type Response[T any] struct {
+	Body   string
+	Err    error
+	Result T
+}
+
+func FromResponse[T any](ctx context.Context, resp *http.Response, err error, allowedStatus ...int) (oresp Response[T]) {
+	oresp = Response[T]{}
+
 	if err != nil {
-		return "", fmt.Errorf("error sending request: %w", err)
+		oresp.Err = fmt.Errorf("error sending request: %w", err)
+		return
 	}
-	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("error reading response body: %w", err)
+		oresp.Err = fmt.Errorf("error reading response body: %w", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	oresp.Body = strings.TrimSpace(string(body))
+
+	if !slices.Contains(allowedStatus, resp.StatusCode) {
+		oresp.Err = fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("OpenRouter API returned status %d: %s", resp.StatusCode, string(body))
+	if err = json.Unmarshal(body, &oresp.Result); err != nil {
+		oresp.Err = fmt.Errorf("error unmarshaling response: %w", err)
 	}
 
-	var openRouterResp OpenRouterResponse
-	if err := json.Unmarshal(body, &openRouterResp); err != nil {
-		return "", fmt.Errorf("error parsing response: %w", err)
-	}
-
-	if len(openRouterResp.Choices) == 0 {
-		return "", fmt.Errorf("OpenRouter API returned no choices: %d %s", resp.StatusCode, string(body))
-	}
-
-	fmt.Println(string(body))
-
-	return openRouterResp.Choices[0].Message.Content, nil
+	return oresp
 }
