@@ -76,6 +76,30 @@ type ToolCall struct {
 
 type ProviderRequest struct {
 	Sort string `json:"sort,omitempty"`
+
+	// the api documentation doesn't mention the below 2025-05-21 but the Provider Routing page does
+	Order             []string           `json:"order"`
+	AllowFallback     bool               `json:"allow_fallback,omitempty"`
+	RequireParameters bool               `json:"require_parameters,omitempty"`
+	DataCollection    DataCollectionEnum `json:"data_collection,omitempty"`
+	Only              []string           `json:"only"`
+	Ignore            []string           `json:"ignore"`
+	Quantizations     []string           `json:"quantizations"`
+	MaxPrice          *MaxPrice          `json:"max_price,omitempty"`
+}
+
+type DataCollectionEnum string
+
+const (
+	AllowDataCollection DataCollectionEnum = "allow"
+	DenyDataCollection  DataCollectionEnum = "deny"
+)
+
+type MaxPrice struct {
+	Price      *float64 `json:"price,omitempty"`
+	Completion *float64 `json:"completion,omitempty"`
+	Request    *float64 `json:"request,omitempty"`
+	Image      *float64 `json:"image,omitempty"`
 }
 
 type ReasoningRequest struct {

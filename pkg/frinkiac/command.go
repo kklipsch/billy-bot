@@ -6,50 +6,30 @@ import (
 	"net/http"
 
 	"github.com/kklipsch/billy-bot/pkg/config"
+	"github.com/kklipsch/billy-bot/pkg/jsonschema"
 	openrouter "github.com/kklipsch/billy-bot/pkg/openrouter"
 )
 
 var (
-	FrinkiacTool = openrouter.Tool{
-		Type: "function",
-		Function: openrouter.Function{
-			Name:        "frinkiac",
-			Description: "Search frinkiac for a scene",
-			Parameters: openrouter.Parameters{
-				Type: "object",
-				Properties: map[string]openrouter.Property{
-					"quote": {
-						Type:        "string",
-						Description: "The quote to search for.",
-					},
-					"confidence": {
-						Type:        "number",
-						Description: "The confidence score of the quote.",
-					},
-					"character": {
-						Type:        "string",
-						Description: "The character who said the quote.",
-					},
-					"season": {
-						Type:        "integer",
-						Description: "The season number.",
-					},
-					"episode": {
-						Type:        "integer",
-						Description: "The episode number.",
-					},
-				},
-				Required: []string{"quote"},
+	FrinkiacResponseSchema = jsonschema.NewArraySchema(
+		jsonschema.NewObjectSchema(
+			map[string]*jsonschema.Schema{
+				"quote":      jsonschema.NewStringSchema(),
+				"confidence": jsonschema.NewNumberSchema(),
+				"character":  jsonschema.NewStringSchema(),
+				"season":     jsonschema.NewIntegerSchema(),
+				"episode":    jsonschema.NewIntegerSchema(),
 			},
-		},
-	}
+			[]string{"quote", "confidence"},
+		),
+	)
 
 	FrinkiacPrompt = openrouter.ChatMessage{
 		Role: "system",
 		Content: `You are a helpful assistant with encyclopedic knowledge of The Simpsons. 
 		You have access to a website called frinkiac that can find scenes from the Simpsons based on the text used in closed captioning of the Simpsons.
 		Your goal is to categorize a set of text and think of any Simpsons quotes that are relevant to the text that should be findable in frinkiac.
-		Your output should be a list JSON objects with a confidence score from 0 to 1.0 and a quote that is a good search term for the frinkiac tool.
+		Your output should be a list JSON quote objects with a confidence score from 0 to 1.0 and a quote that is a good search term for the frinkiac tool.
 		If you can identify the season and episode number, include those as well.
 		You should sort the list by confidence score in descending order.`,
 	}
@@ -75,9 +55,11 @@ func (o *Command) Run(ctx context.Context) error {
 			FrinkiacPrompt,
 			{Role: "user", Content: o.Prompt},
 		},
-		ToolsEnabled: openrouter.ToolsEnabled{
-			Tools:      []openrouter.Tool{FrinkiacTool},
-			ToolChoice: "auto",
+		ResponseFormatEnabled: openrouter.NewResponseFormatEnabled("quotes", FrinkiacResponseSchema),
+		BaseRequest: openrouter.BaseRequest{
+			Provider: &openrouter.ProviderRequest{
+				RequireParameters: true,
+			},
 		},
 	}
 

@@ -11,7 +11,8 @@ type ResponseFormatEnabled struct {
 }
 
 // NewResponseFormatEnabled creates a new ResponseFormatEnabled with the given type and JSON schema
-func NewResponseFormatEnabled(schema *jsonschema.Schema) ResponseFormatEnabled {
+func NewResponseFormatEnabled(name string, schema *jsonschema.Schema) ResponseFormatEnabled {
+	schema.Strict = true
 	return ResponseFormatEnabled{
 		Type:       "json_schema",
 		JSONSchema: schema,

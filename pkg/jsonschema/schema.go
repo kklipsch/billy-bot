@@ -2,7 +2,9 @@ package jsonschema
 
 // Schema represents a JSON Schema structure with type safety
 type Schema struct {
+	Name                 string             `json:"name,omitempty"`
 	Type                 string             `json:"type,omitempty"`
+	Strict               bool               `json:"strict,omitempty"`
 	Properties           map[string]*Schema `json:"properties,omitempty"`
 	Required             []string           `json:"required,omitempty"`
 	Items                *Schema            `json:"items,omitempty"`
