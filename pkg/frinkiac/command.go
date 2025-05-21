@@ -47,8 +47,8 @@ var (
 	FrinkiacPrompt = openrouter.ChatMessage{
 		Role: "system",
 		Content: `You are a helpful assistant with encyclopedic knowledge of The Simpsons. 
-		You have access to a tool called frinkiac that can find scenes from the Simpsons based on the text used in closed captioning of the Simpsons.
-		Your goal is to categorize a set of text and think of any Simpsons quotes that are relevant to the text.
+		You have access to a website called frinkiac that can find scenes from the Simpsons based on the text used in closed captioning of the Simpsons.
+		Your goal is to categorize a set of text and think of any Simpsons quotes that are relevant to the text that should be findable in frinkiac.
 		Your output should be a list JSON objects with a confidence score from 0 to 1.0 and a quote that is a good search term for the frinkiac tool.
 		If you can identify the season and episode number, include those as well.
 		You should sort the list by confidence score in descending order.`,
