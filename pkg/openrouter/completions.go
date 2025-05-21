@@ -20,7 +20,8 @@ func NewCompletionReq(ctx context.Context, request ChatCompletionRequest) (*http
 // per https://openrouter.ai/docs/api-reference/chat-completion 2025-05-19
 type ChatCompletionRequest struct {
 	BaseRequest
-	ToolsEnabled // the api documentation doesnt mention it but the tools does
+	ToolsEnabled          // the api documentation doesnt mention it but the tools does
+	ResponseFormatEnabled // the api documentation doesnt mention it but the structured responses doc does
 
 	Model    string        `json:"model"`
 	Messages []ChatMessage `json:"messages"`
