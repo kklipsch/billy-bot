@@ -35,3 +35,5 @@ Thumbs.db
 
 .env
 *.pem
+
+.aider*
