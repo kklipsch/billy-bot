@@ -1,6 +1,8 @@
 # Billy Bot
 
-[billy](billy-bot.png) has left me hanging once again.  Well fool me once shame on you, fool me can't be fooled again.  I'm going to replace Billy's most important skill, being able to pick the correct Simpson's screen cap for any occasion, with a bot so that I'll never be deserted again.
+![billy-bot](billy-bot.png)
+
+[billy](https://github.com/billyhandiii)) has left me hanging once again.  Well fool me once shame on you, fool me can't be fooled again.  I'm going to replace Billy's most important skill, being able to pick the correct Simpson's screen cap for any occasion, with a bot so that I'll never be deserted again.
 
 ## The plan
 
