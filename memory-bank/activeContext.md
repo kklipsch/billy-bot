@@ -2,20 +2,22 @@
 
 ## Current Work Focus
 
-The current focus of the Billy Bot project is on implementing Step 1 as outlined in the README: **Categorizing a prompt into a Simpson's quote**. This is the foundational capability that will enable the bot to match user inputs with appropriate Simpsons references.
+The current focus of the Billy Bot project is on implementing Step 1 as outlined in the README: **Categorizing a prompt into a Simpson's quote**. This is the foundational capability that will enable the bot to match user inputs with appropriate Simpsons references, with the primary goal of integrating with GitHub for issues, tasks, and pull requests.
 
 Key aspects of this work include:
 - Developing the core logic for analyzing prompts
 - Implementing the matching algorithm to find relevant Simpsons quotes
 - Integrating with the Frinkiac API to retrieve corresponding screen captures
 - Setting up the command-line interface for the Frinkiac functionality
+- Preparing for GitHub integration as the first platform target
 
 ## Recent Changes
 
 As the project is in its initial development phase, the recent changes include:
 - Setting up the basic project structure with Go modules
 - Implementing the CLI framework using Kong
-- Creating the command structure for Smee and Frinkiac functionality
+- Creating the command structure for Frinkiac functionality
+- Setting up a prototype Smee client for early webhook testing
 - Setting up logging with zerolog
 - Implementing context-based cancellation for graceful shutdown
 - Adding environment variable loading with godotenv
@@ -29,25 +31,25 @@ The immediate next steps for the project are:
    - Add quote search functionality
    - Implement screen capture retrieval
 
-2. **Enhance Prompt Categorization**:
+2. **Develop GitHub Integration**:
+   - Create GitHub API client for interacting with issues, tasks, and pull requests
+   - Implement event handling for GitHub webhooks
+   - Design response format for GitHub comments
+
+3. **Enhance Prompt Categorization**:
    - Develop more sophisticated matching algorithms
    - Implement confidence scoring for quote matches
    - Add support for fuzzy matching and synonyms
-
-3. **Implement Webhook Handling**:
-   - Complete the Smee client implementation
-   - Add webhook event processing logic
-   - Implement response generation for webhook events
 
 4. **Add Testing**:
    - Write unit tests for core functionality
    - Implement integration tests for API interactions
    - Add end-to-end tests for command execution
 
-5. **Improve Documentation**:
-   - Add detailed usage instructions
-   - Document API interactions
-   - Provide examples of common use cases
+5. **Prepare for Future Platform Integrations**:
+   - Design modular architecture to support Discord and Slack in the future
+   - Document integration points for additional platforms
+   - Create abstraction layers for platform-specific functionality
 
 ## Active Decisions and Considerations
 

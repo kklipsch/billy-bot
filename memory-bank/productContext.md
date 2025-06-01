@@ -22,7 +22,7 @@ This project represents a practical solution to ensure that users always have ac
 
 The Billy Bot system is designed to work through a simple yet effective process:
 
-1. **Input Reception**: The system receives input in the form of prompts or situations that require a Simpsons reference. This could come through direct CLI commands or webhook events received via the Smee client.
+1. **Input Reception**: The system receives input in the form of prompts or situations that require a Simpsons reference. This primarily comes through GitHub issues, tasks, and pull requests, with future plans to support Discord and Slack.
 
 2. **Prompt Analysis**: The system analyzes the prompt to understand its context, tone, and key elements that would make for a good Simpsons reference match.
 
@@ -30,7 +30,12 @@ The Billy Bot system is designed to work through a simple yet effective process:
 
 4. **Screen Cap Retrieval**: Once appropriate quotes are identified, the system uses the Frinkiac API to retrieve the corresponding screen captures from the Simpsons episodes.
 
-5. **Response Delivery**: The system delivers the selected quotes and screen captures back to the user or the requesting service.
+5. **Response Delivery**: The system delivers the selected quotes and screen captures back to the appropriate platform:
+   - For GitHub: Comments on issues, tasks, or pull requests
+   - For future Discord integration: Messages in channels or threads
+   - For future Slack integration: Messages in channels or threads
+
+The Smee client serves as an early prototype for webhook handling, but the primary focus is on direct GitHub integration.
 
 ## User Experience Goals
 
@@ -48,13 +53,15 @@ The Billy Bot system is designed to work through a simple yet effective process:
 
 ## Target Audience
 
-1. **Simpsons Enthusiasts**: People who appreciate and frequently use Simpsons references in their communication.
+1. **GitHub Users**: Developers and teams who use GitHub for collaboration and want to enhance their issues, tasks, and pull requests with relevant Simpsons references.
 
-2. **Content Creators**: Individuals who create content and want to enhance it with relevant Simpsons references.
+2. **Discord and Slack Users** (future): Communities and teams who use these platforms for communication and would benefit from Simpsons references.
 
-3. **Communication Platforms**: Services that could integrate with Billy Bot to offer Simpsons reference capabilities to their users.
+3. **Simpsons Enthusiasts**: People who appreciate and frequently use Simpsons references in their communication.
 
-4. **Anyone Previously Dependent on Billy**: Those who previously relied on the human Billy for their Simpsons reference needs.
+4. **Software Development Teams**: Teams looking to add humor and cultural references to their development process.
+
+5. **Anyone Previously Dependent on Billy**: Those who previously relied on the human Billy for their Simpsons reference needs.
 
 ## Success Metrics
 

@@ -6,7 +6,8 @@ As the project is in its initial development phase, the following components are
 
 1. **Basic CLI Framework**:
    - Command-line parsing using Kong
-   - Subcommand structure for Smee and Frinkiac functionality
+   - Subcommand structure for Frinkiac functionality
+   - Early prototype of Smee client for webhook testing
    - Environment variable loading from .env files
    - Logging setup with zerolog
    - Signal handling for graceful shutdown
@@ -26,25 +27,30 @@ The following components and features are still pending implementation:
    - Screen capture retrieval
    - Result formatting and presentation
 
-2. **Prompt Categorization**:
+2. **GitHub Integration** (Primary Goal):
+   - GitHub API client for issues, tasks, and pull requests
+   - Webhook handling for GitHub events
+   - Comment formatting for GitHub responses
+   - Authentication and permissions handling
+
+3. **Prompt Categorization**:
    - Prompt analysis logic
    - Quote matching algorithms
    - Confidence scoring
    - Fuzzy matching and synonyms support
 
-3. **Smee Client**:
-   - Webhook event reception
-   - Event parsing and validation
-   - Event handling logic
-   - Response generation
+4. **Future Platform Integrations**:
+   - Discord integration
+   - Slack integration
+   - Abstraction layer for supporting multiple platforms
 
-4. **Testing Infrastructure**:
+5. **Testing Infrastructure**:
    - Unit tests for core functionality
    - Integration tests for API interactions
    - End-to-end tests for command execution
    - Test fixtures and mocks
 
-5. **Documentation**:
+6. **Documentation**:
    - Usage instructions
    - API documentation
    - Example use cases
@@ -64,7 +70,8 @@ As the project is in early development, there are several known issues and limit
 
 1. **Incomplete Functionality**:
    - The core functionality of categorizing prompts into Simpson's quotes is still under development.
-   - The Smee client for webhook handling is not yet implemented.
+   - The GitHub integration is not yet implemented.
+   - The Smee client is only an early prototype for webhook testing.
 
 2. **Missing Tests**:
    - Test coverage is limited or non-existent at this stage.
@@ -107,7 +114,8 @@ The project started with a humorous premise: replacing a human (Billy) who was u
 
 The project roadmap suggests a phased approach:
 1. First, focus on the core functionality of categorizing prompts into Simpson's quotes.
-2. Then, expand to include webhook handling via the Smee client.
-3. Finally, consider additional features like more sophisticated matching algorithms, caching, and potentially a web interface.
+2. Then, implement the GitHub integration for issues, tasks, and pull requests.
+3. If successful, expand to include Discord and Slack integrations.
+4. Finally, consider additional features like more sophisticated matching algorithms, caching, and potentially a web interface.
 
-This incremental approach allows for early validation of the core concept before investing in more complex features.
+This incremental approach allows for early validation of the core concept before investing in more complex features and additional platform integrations.
