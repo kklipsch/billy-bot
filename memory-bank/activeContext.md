@@ -7,7 +7,7 @@ The current focus of the Billy Bot project is on implementing Step 1 as outlined
 Key aspects of this work include:
 - Developing the core logic for analyzing prompts
 - Implementing the matching algorithm to find relevant Simpsons quotes
-- Integrating with the Frinkiac API to retrieve corresponding screen captures
+- Integrating with the Frinkiac website to retrieve corresponding screen captures through web scraping
 - Setting up the command-line interface for the Frinkiac functionality
 - Preparing for GitHub integration as the first platform target
 
@@ -27,9 +27,9 @@ As the project is in its initial development phase, the recent changes include:
 The immediate next steps for the project are:
 
 1. **Complete the Frinkiac Integration**:
-   - Implement the full API client for the Frinkiac service
-   - Add quote search functionality
-   - Implement screen capture retrieval
+   - Implement web scraping functionality for the Frinkiac website
+   - Add quote search functionality using URL queries (e.g., `https://frinkiac.com/?q=quote`)
+   - Implement HTML parsing to extract screen captures from responses
 
 2. **Develop GitHub Integration**:
    - Create GitHub API client for interacting with issues, tasks, and pull requests
@@ -53,11 +53,13 @@ The immediate next steps for the project are:
 
 ## Active Decisions and Considerations
 
-### API Integration Strategy
-Currently evaluating the best approach for integrating with the Frinkiac API:
-- Direct HTTP requests vs. using a client library
-- Synchronous vs. asynchronous processing
+### Web Scraping Strategy
+Currently evaluating the best approach for interacting with the Frinkiac website:
+- HTML parsing techniques and libraries
+- Handling of website structure changes
+- Rate limiting and respectful scraping practices
 - Caching strategy for frequently requested quotes
+- Error handling for failed requests or unexpected HTML structures
 
 ### Command Structure
 Deciding on the optimal command structure and options for the CLI:
@@ -102,7 +104,7 @@ Considering performance aspects:
 ## Learnings and Project Insights
 
 ### Initial Observations
-- The Frinkiac API provides a rich source of Simpsons content but requires careful integration
+- The Frinkiac website provides a rich source of Simpsons content but requires careful HTML parsing
 - Command-line tools benefit greatly from intuitive, well-documented interfaces
 - Go's concurrency model is well-suited for handling webhook events
 

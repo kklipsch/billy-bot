@@ -22,9 +22,9 @@ As the project is in its initial development phase, the following components are
 The following components and features are still pending implementation:
 
 1. **Frinkiac Integration**:
-   - API client for the Frinkiac service
-   - Quote search functionality
-   - Screen capture retrieval
+   - Web scraping functionality for the Frinkiac website
+   - URL query construction (e.g., `https://frinkiac.com/?q=quote`)
+   - HTML parsing for extracting screen captures
    - Result formatting and presentation
 
 2. **GitHub Integration** (Primary Goal):
@@ -98,11 +98,11 @@ The project started with a humorous premise: replacing a human (Billy) who was u
 
 4. **Command Pattern**: The decision to use the command pattern for CLI interactions provides a clean separation of concerns and makes it easier to add new functionality in the future.
 
-5. **External API Integration**: Rather than implementing screen cap selection from scratch, the project leverages the existing Frinkiac API, focusing on the prompt categorization and integration aspects.
+5. **Web Scraping Integration**: Rather than implementing screen cap selection from scratch, the project leverages the existing Frinkiac website through web scraping, focusing on the prompt categorization and HTML parsing aspects.
 
 ### Ongoing Considerations
 
-1. **API Integration Strategy**: The team is still evaluating the best approach for integrating with the Frinkiac API, considering factors like direct HTTP requests vs. client libraries and synchronous vs. asynchronous processing.
+1. **Web Scraping Strategy**: The team is still evaluating the best approach for interacting with the Frinkiac website, considering factors like HTML parsing techniques, handling website structure changes, and implementing respectful scraping practices.
 
 2. **Command Structure**: Decisions about the optimal command structure and options for the CLI are still being made, including parameters for the Frinkiac command and output format options.
 

@@ -16,7 +16,7 @@
   - `os`: For operating system functionality
 
 ### External Services
-- **Frinkiac API**: External service used to search for and retrieve Simpsons scenes based on quotes.
+- **Frinkiac Website**: A website designed for humans (not an API) that allows searching for Simpsons scenes based on quotes. Queries are made in the form of `https://frinkiac.com/?q=garbage%20water` and the site returns HTML rendered for human consumption.
 - **Smee**: Service for receiving webhook events, allowing the bot to respond to external triggers.
 
 ## Development Setup
@@ -43,8 +43,9 @@
 - **Response Time**: The bot should provide quick responses to maintain a good user experience.
 - **Resource Usage**: As a CLI tool, the application should have minimal resource footprint.
 
-### External API Limitations
-- **Frinkiac API Rate Limits**: The bot's operation may be constrained by any rate limits imposed by the Frinkiac API.
+### External Website Limitations
+- **Frinkiac Website Rate Limits**: The bot's operation may be constrained by any rate limits or anti-scraping measures imposed by the Frinkiac website.
+- **HTML Parsing Challenges**: Since Frinkiac returns HTML designed for humans, the bot will need to parse this HTML to extract the relevant screen captures.
 - **Webhook Processing Capacity**: The number of webhook events that can be processed simultaneously may be limited by system resources.
 
 ### Security Considerations
@@ -79,7 +80,7 @@ Global options include:
 
 Available commands:
 - `smee`: Run the Smee client to receive webhook events
-- `frinkiac`: Engage the Frinkiac tool to find Simpsons scenes
+- `frinkiac`: Engage the Frinkiac tool to find Simpsons scenes by querying the Frinkiac website
 
 ### Logging Practices
 - **Structured Logging**: All logs are structured in JSON format for better parsing and analysis.

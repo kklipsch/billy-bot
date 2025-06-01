@@ -7,9 +7,10 @@ Billy Bot follows a command-line application architecture built in Go, with a cl
 ```
 flowchart TD
     CLI[CLI Interface] --> Commands[Command Handlers]
-    Commands --> Frinkiac[Frinkiac Service]
+    Commands --> Frinkiac[Frinkiac Module]
     Commands --> Smee[Smee Client]
-    Frinkiac --> API[External Frinkiac API]
+    Frinkiac --> Website[Frinkiac Website]
+    Frinkiac --> Parser[HTML Parser]
     Smee --> Webhooks[Webhook Events]
 ```
 
@@ -17,8 +18,9 @@ flowchart TD
 
 1. **CLI Interface**: The main entry point for the application, handling command-line arguments and routing to appropriate command handlers.
 2. **Command Handlers**: Specialized modules that implement specific functionality (Smee, Frinkiac).
-3. **Frinkiac Service**: Handles interaction with the Frinkiac API to find and retrieve Simpsons scenes.
-4. **Smee Client**: Manages webhook event reception and processing.
+3. **Frinkiac Module**: Handles interaction with the Frinkiac website to find and retrieve Simpsons scenes by querying the website and parsing the HTML responses.
+4. **HTML Parser**: Component responsible for extracting relevant information from the HTML responses returned by the Frinkiac website.
+5. **Smee Client**: Manages webhook event reception and processing.
 
 ## Key Technical Decisions
 
@@ -32,7 +34,7 @@ flowchart TD
 
 5. **Context-Based Cancellation**: The application uses Go's context package for proper handling of cancellation signals, ensuring graceful shutdown.
 
-6. **External API Integration**: Rather than implementing screen cap selection logic from scratch, the project integrates with the existing Frinkiac API.
+6. **Web Scraping Integration**: Rather than implementing screen cap selection logic from scratch, the project interacts with the existing Frinkiac website, parsing its HTML responses to extract the necessary information.
 
 ## Design Patterns in Use
 
@@ -60,8 +62,8 @@ err = k.Run()
 ### Commands to Services
 Each command handler interacts with its respective service (Smee client or Frinkiac service) to perform the requested operation.
 
-### Service to External APIs
-The Frinkiac service communicates with the external Frinkiac API to search for and retrieve Simpsons scenes based on quotes.
+### Module to External Websites
+The Frinkiac module communicates with the Frinkiac website by constructing appropriate URLs (e.g., `https://frinkiac.com/?q=garbage%20water`), sending HTTP requests, and then parsing the returned HTML to extract the relevant Simpsons scenes based on quotes.
 
 ## Critical Implementation Paths
 
@@ -75,9 +77,11 @@ The Frinkiac service communicates with the external Frinkiac API to search for a
 ### Frinkiac Quote Matching Path
 1. User provides a prompt or quote
 2. The Frinkiac command processes the input
-3. The system searches for matching Simpsons quotes with confidence levels
-4. Matching quotes are used to retrieve screen captures
-5. Results are returned to the user
+3. The system constructs a URL query to the Frinkiac website (e.g., `https://frinkiac.com/?q=prompt`)
+4. The system sends an HTTP request to the Frinkiac website
+5. The HTML response is parsed to extract matching Simpsons quotes with confidence levels
+6. The system extracts screen captures from the parsed HTML
+7. Results are returned to the user
 
 ### Webhook Event Handling Path
 1. External service sends a webhook event

@@ -9,7 +9,7 @@ Billy Bot is a Go-based application designed to replace a human's (Billy's) skil
 1. **Prompt Categorization**: Analyze user prompts and categorize them into relevant Simpsons quotes.
 2. **Screen Cap Selection**: Select the most appropriate Simpsons screen capture that matches the categorized quote.
 3. **GitHub Integration**: Provide appropriate Simpsons screen captures for GitHub issues, tasks, and pull requests.
-4. **Frinkiac Integration**: Leverage the Frinkiac API to find and retrieve Simpsons scenes based on quotes.
+4. **Frinkiac Integration**: Interact with the Frinkiac website (a site designed for humans, not an API) to find and retrieve Simpsons scenes based on quotes.
 5. **Platform Extensibility**: Design the system to support future integrations with platforms like Discord and Slack.
 
 ## Project Goals
@@ -30,7 +30,7 @@ Billy Bot is a Go-based application designed to replace a human's (Billy's) skil
 
 ### In Scope
 - Development of a Go-based application with CLI commands for GitHub and Frinkiac functionality
-- Integration with the Frinkiac API for Simpsons scene retrieval
+- Integration with the Frinkiac website for Simpsons scene retrieval (via web scraping)
 - GitHub integration for issues, tasks, and pull requests
 - Basic prompt categorization functionality
 - Prototype webhook event handling via Smee (early prototype)

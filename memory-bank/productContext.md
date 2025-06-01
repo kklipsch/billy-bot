@@ -28,7 +28,7 @@ The Billy Bot system is designed to work through a simple yet effective process:
 
 3. **Quote Matching**: Using the analyzed prompt, the system searches for and identifies the most appropriate Simpsons quotes that match the situation. This is done with varying levels of confidence, allowing for multiple potential matches.
 
-4. **Screen Cap Retrieval**: Once appropriate quotes are identified, the system uses the Frinkiac API to retrieve the corresponding screen captures from the Simpsons episodes.
+4. **Screen Cap Retrieval**: Once appropriate quotes are identified, the system queries the Frinkiac website (e.g., `https://frinkiac.com/?q=quote`) and parses the HTML response to extract the corresponding screen captures from the Simpsons episodes. Frinkiac is a website designed for humans, not an API, so the system needs to parse the HTML content.
 
 5. **Response Delivery**: The system delivers the selected quotes and screen captures back to the appropriate platform:
    - For GitHub: Comments on issues, tasks, or pull requests
