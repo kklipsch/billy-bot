@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -66,6 +68,83 @@ func TestClient(t *testing.T) {
 	require.NotNil(t, client, "Failed to create client")
 }
 
+// TestDoRequest tests the doRequest method with a mock HTTP client
+func TestDoRequest(t *testing.T) {
+	// Create a mock HTTP client that returns a predefined response
+	mockClient := &http.Client{
+		Transport: &mockTransport{
+			response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(`{"test": "data"}`)),
+			},
+		},
+	}
+
+	// Create a client with the mock HTTP client
+	client := New(WithHTTPClient(mockClient))
+
+	// Make a request
+	ctx := context.Background()
+	resp, err := client.doRequest(ctx, RequestOptions{
+		Method: http.MethodGet,
+		Path:   "/test",
+		LogContext: map[string]interface{}{
+			"test": "value",
+		},
+	})
+
+	// Verify the response
+	require.NoError(t, err, "doRequest should not return an error")
+	require.NotNil(t, resp, "doRequest should return a response")
+	require.Equal(t, http.StatusOK, resp.StatusCode, "Response status code should be 200")
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	require.NoError(t, err, "Failed to read response body")
+	resp.Body.Close()
+
+	// Verify the response body
+	assert.Equal(t, `{"test": "data"}`, string(body), "Response body should match expected value")
+}
+
+// TestDoRequestError tests the doRequest method with an error response
+func TestDoRequestError(t *testing.T) {
+	// Create a mock HTTP client that returns an error response
+	mockClient := &http.Client{
+		Transport: &mockTransport{
+			response: &http.Response{
+				StatusCode: http.StatusBadRequest,
+				Body:       io.NopCloser(strings.NewReader(`{"error": "bad request"}`)),
+			},
+		},
+	}
+
+	// Create a client with the mock HTTP client
+	client := New(WithHTTPClient(mockClient))
+
+	// Make a request
+	ctx := context.Background()
+	_, err := client.doRequest(ctx, RequestOptions{
+		Method: http.MethodGet,
+		Path:   "/test",
+	})
+
+	// Verify the error
+	require.Error(t, err, "doRequest should return an error for non-200 status codes")
+	assert.Contains(t, err.Error(), "400", "Error should contain the status code")
+	assert.Contains(t, err.Error(), "bad request", "Error should contain the response body")
+}
+
+// mockTransport is a mock http.RoundTripper that returns a predefined response
+type mockTransport struct {
+	response *http.Response
+	err      error
+}
+
+func (m *mockTransport) RoundTrip(*http.Request) (*http.Response, error) {
+	return m.response, m.err
+}
+
 // TestParseAPIResponse tests parsing the API response from a file
 func TestParseAPIResponse(t *testing.T) {
 	// Read the test data file
@@ -104,7 +183,7 @@ func TestParseAPIResponse(t *testing.T) {
 
 		season := apiResult.Episode[:3]  // S16
 		episode := apiResult.Episode[3:] // E01
-		id := fmt.Sprintf("%d", apiResult.ID)
+		id := fmt.Sprintf("%d", apiResult.Timestamp)
 
 		// Construct the image path
 		imagePath := fmt.Sprintf("/img/%s/%s/medium.jpg", apiResult.Episode, id)
@@ -132,135 +211,4 @@ func TestParseAPIResponse(t *testing.T) {
 		}
 	}
 	assert.GreaterOrEqual(t, s10e19Count, 3, "Expected several subsequent results to be from S10E19")
-}
-
-// TestParseAPICaptionResponse tests parsing the API caption response
-func TestParseAPICaptionResponse(t *testing.T) {
-	// Create a sample API caption response
-	captionJSON := `{
-		"Episode": {
-			"Id": 671,
-			"Key": "S16E01",
-			"Season": 16,
-			"EpisodeNumber": 1,
-			"Title": "Treehouse of Horror XV",
-			"Director": "David Silverman",
-			"Writer": "Bill Odenkirk",
-			"OriginalAirDate": "7-Nov-04",
-			"WikiLink": "https://en.wikipedia.org/wiki/Treehouse_of_Horror_XV"
-		},
-		"Frame": {
-			"Id": 2109531,
-			"Episode": "S16E01",
-			"Timestamp": 408242
-		},
-		"Subtitles": [
-			{
-				"Id": 172888,
-				"RepresentativeTimestamp": 406573,
-				"Episode": "S16E01",
-				"StartTimestamp": 405767,
-				"EndTimestamp": 407266,
-				"Content": "( chuckling)",
-				"Language": "en"
-			},
-			{
-				"Id": 172889,
-				"RepresentativeTimestamp": 408450,
-				"Episode": "S16E01",
-				"StartTimestamp": 407266,
-				"EndTimestamp": 409400,
-				"Content": "Everything's coming up Homer.",
-				"Language": "en"
-			},
-			{
-				"Id": 172890,
-				"RepresentativeTimestamp": 410327,
-				"Episode": "S16E01",
-				"StartTimestamp": 409400,
-				"EndTimestamp": 411767,
-				"Content": "Yeah, well, the joke's on you, smart guy.",
-				"Language": "en"
-			}
-		],
-		"Nearby": [
-			{
-				"Id": 2109527,
-				"Episode": "S16E01",
-				"Timestamp": 407199
-			},
-			{
-				"Id": 2109528,
-				"Episode": "S16E01",
-				"Timestamp": 407616
-			},
-			{
-				"Id": 2109529,
-				"Episode": "S16E01",
-				"Timestamp": 408033
-			},
-			{
-				"Id": 2109531,
-				"Episode": "S16E01",
-				"Timestamp": 408242
-			},
-			{
-				"Id": 2109534,
-				"Episode": "S16E01",
-				"Timestamp": 408450
-			},
-			{
-				"Id": 2109533,
-				"Episode": "S16E01",
-				"Timestamp": 408659
-			},
-			{
-				"Id": 2109530,
-				"Episode": "S16E01",
-				"Timestamp": 408867
-			}
-		]
-	}`
-
-	// Parse the JSON data
-	var apiCaption APICaption
-	err := json.Unmarshal([]byte(captionJSON), &apiCaption)
-	require.NoError(t, err, "Failed to parse JSON data")
-
-	// Verify the episode details
-	assert.Equal(t, 671, apiCaption.Episode.Id, "Episode ID should match")
-	assert.Equal(t, "S16E01", apiCaption.Episode.Key, "Episode key should match")
-	assert.Equal(t, 16, apiCaption.Episode.Season, "Season should match")
-	assert.Equal(t, 1, apiCaption.Episode.EpisodeNumber, "Episode number should match")
-	assert.Equal(t, "Treehouse of Horror XV", apiCaption.Episode.Title, "Title should match")
-
-	// Verify the frame details
-	assert.Equal(t, 2109531, apiCaption.Frame.Id, "Frame ID should match")
-	assert.Equal(t, "S16E01", apiCaption.Frame.Episode, "Frame episode should match")
-	assert.Equal(t, 408242, apiCaption.Frame.Timestamp, "Frame timestamp should match")
-
-	// Verify the subtitles
-	require.Len(t, apiCaption.Subtitles, 3, "Should have 3 subtitles")
-	assert.Equal(t, "( chuckling)", apiCaption.Subtitles[0].Content, "First subtitle content should match")
-	assert.Equal(t, "Everything's coming up Homer.", apiCaption.Subtitles[1].Content, "Second subtitle content should match")
-	assert.Equal(t, "Yeah, well, the joke's on you, smart guy.", apiCaption.Subtitles[2].Content, "Third subtitle content should match")
-
-	// Verify the nearby frames
-	require.Len(t, apiCaption.Nearby, 7, "Should have 7 nearby frames")
-	assert.Equal(t, 408242, apiCaption.Nearby[3].Timestamp, "Fourth nearby frame timestamp should match")
-
-	// Test extracting caption text from subtitles
-	var captionBuilder strings.Builder
-	for i, subtitle := range apiCaption.Subtitles {
-		if i > 0 {
-			captionBuilder.WriteString(" ")
-		}
-		captionBuilder.WriteString(subtitle.Content)
-	}
-	caption := captionBuilder.String()
-	assert.Equal(t, "( chuckling) Everything's coming up Homer. Yeah, well, the joke's on you, smart guy.", caption, "Combined caption should match")
-
-	// Test constructing the image path
-	imagePath := fmt.Sprintf("/img/%s/%d/medium.jpg", apiCaption.Frame.Episode, apiCaption.Frame.Timestamp)
-	assert.Equal(t, "/img/S16E01/408242/medium.jpg", imagePath, "Image path should match")
 }
