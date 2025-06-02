@@ -21,6 +21,7 @@ As the project is in its initial development phase, the recent changes include:
 - Setting up logging with zerolog
 - Implementing context-based cancellation for graceful shutdown
 - Adding environment variable loading with godotenv
+- Adding GitHub Action for code quality checks (gofmt, golint, and tests)
 
 ## Next Steps
 
@@ -87,6 +88,12 @@ Considering performance aspects:
 - Preference for clean separation of concerns
 - Package structure that reflects the domain model
 - Clear interfaces between components
+
+### Code Quality Standards
+- All code must be formatted with gofmt
+- All code must pass golint checks
+- All tests must pass before merging
+- GitHub Actions automatically verify these requirements on push and pull requests
 
 ### Error Handling
 - Explicit error checking (Go style)

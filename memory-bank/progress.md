@@ -16,6 +16,7 @@ As the project is in its initial development phase, the following components are
    - Go module setup with dependencies
    - Basic package organization
    - Command pattern implementation
+   - GitHub Action for code quality checks (gofmt, golint, and tests)
 
 3. **Frinkiac Integration**:
    - API integration with Frinkiac's JSON endpoint (`/api/search`)
@@ -82,7 +83,7 @@ As the project is in early development, there are several known issues and limit
 
 2. **Missing Tests**:
    - Test coverage is limited or non-existent at this stage.
-   - No CI/CD pipeline is in place for automated testing.
+   - ✅ GitHub Action is now in place for automated code quality checks (gofmt, golint, and tests).
 
 3. **Documentation Gaps**:
    - Limited documentation on how to use the application.
@@ -106,6 +107,12 @@ The project started with a humorous premise: replacing a human (Billy) who was u
 4. **Command Pattern**: The decision to use the command pattern for CLI interactions provides a clean separation of concerns and makes it easier to add new functionality in the future.
 
 5. **Frinkiac API Integration**: Rather than implementing screen cap selection from scratch, the project leverages the existing Frinkiac website through its JSON API, focusing on the prompt categorization and structured data parsing. This approach was updated from the initial HTML scraping strategy to provide more reliable results.
+
+6. **Code Quality Standards**: The project enforces strict code quality standards through automated GitHub Actions:
+   - All code must be formatted with gofmt
+   - All code must pass golint checks
+   - All tests must pass before merging
+   - These checks run automatically on push and pull requests
 
 ### Ongoing Considerations
 
