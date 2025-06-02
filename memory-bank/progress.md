@@ -32,6 +32,8 @@ The following components and features are still pending implementation:
    - ✅ API integration with Frinkiac's JSON endpoint (`/api/search`)
    - ✅ URL query construction (e.g., `https://frinkiac.com/api/search?q=quote`)
    - ✅ JSON parsing for extracting screen captures information
+   - ✅ Enhanced GetScreenCap function to use JSON API with HTML fallback
+   - ✅ Implemented hybrid approach for screen cap retrieval
    - Result formatting and presentation
 
 2. **GitHub Integration** (Primary Goal):

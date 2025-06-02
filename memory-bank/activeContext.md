@@ -60,13 +60,17 @@ The immediate next steps for the project are:
 
 ### Frinkiac Integration Strategy
 We've updated our approach for interacting with the Frinkiac website:
-- Discovered and implemented the Frinkiac JSON API endpoint (`/api/search`) instead of HTML parsing
+- Discovered and implemented the Frinkiac JSON API endpoint (`/api/search`) instead of HTML parsing for quote searches
 - Created structured data types to represent the API response
 - Implemented proper JSON parsing and conversion to our internal data structures
 - Added unit tests with saved API responses to ensure correct parsing
 - Maintained compatibility with existing code that uses the parsed results
+- Enhanced the GetScreenCap function to use the JSON API endpoint (`/api/caption`) with fallback to HTML parsing
+- Implemented a hybrid approach that tries the API first and falls back to HTML if the API fails
 
-**Current Status**: We have implemented a client that successfully sends quote requests to the Frinkiac API (e.g., `https://frinkiac.com/api/search?q=Everything%27s+coming+up+Milhouse%21`) and correctly parses the JSON response. The client now extracts season, episode, and ID information from the API response and constructs the appropriate image paths. This is more robust than the previous HTML parsing approach since it uses a structured API response rather than trying to parse dynamically generated HTML.
+**Current Status**: We have implemented a client that successfully sends quote requests to the Frinkiac API (e.g., `https://frinkiac.com/api/search?q=Everything%27s+coming+up+Milhouse%21`) and correctly parses the JSON response. The client now extracts season, episode, and ID information from the API response and constructs the appropriate image paths. 
+
+For screen cap retrieval, we've implemented a hybrid approach that first tries to use the JSON API endpoint (`/api/caption?e=S16E01&t=2109531`) and falls back to the HTML endpoint (`/caption/S16E01/2109531`) if the API fails. This provides the best of both worlds - it uses the more efficient and structured JSON API when available, but gracefully falls back to the HTML endpoint when needed. This approach is more resilient to API changes or rate limiting.
 
 ### Command Structure
 Deciding on the optimal command structure and options for the CLI:
