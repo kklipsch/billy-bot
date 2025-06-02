@@ -2,13 +2,13 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/rs/zerolog/log"
-	"golang.org/x/net/html"
 )
 
 // ScreenCapResult represents the result of a screen cap request
@@ -20,13 +20,60 @@ type ScreenCapResult struct {
 	ID        string
 }
 
-// GetScreenCap gets a screen cap from Frinkiac
+// APICaption represents the response from the Frinkiac API caption endpoint
+type APICaption struct {
+	Episode struct {
+		Id              int    `json:"Id"`
+		Key             string `json:"Key"`
+		Season          int    `json:"Season"`
+		EpisodeNumber   int    `json:"EpisodeNumber"`
+		Title           string `json:"Title"`
+		Director        string `json:"Director"`
+		Writer          string `json:"Writer"`
+		OriginalAirDate string `json:"OriginalAirDate"`
+		WikiLink        string `json:"WikiLink"`
+	} `json:"Episode"`
+	Frame struct {
+		Id        int    `json:"Id"`
+		Episode   string `json:"Episode"`
+		Timestamp int    `json:"Timestamp"`
+	} `json:"Frame"`
+	Subtitles []struct {
+		Id                      int    `json:"Id"`
+		RepresentativeTimestamp int    `json:"RepresentativeTimestamp"`
+		Episode                 string `json:"Episode"`
+		StartTimestamp          int    `json:"StartTimestamp"`
+		EndTimestamp            int    `json:"EndTimestamp"`
+		Content                 string `json:"Content"`
+		Language                string `json:"Language"`
+	} `json:"Subtitles"`
+	Nearby []struct {
+		Id        int    `json:"Id"`
+		Episode   string `json:"Episode"`
+		Timestamp int    `json:"Timestamp"`
+	} `json:"Nearby"`
+}
+
+// GetScreenCap gets a screen cap from Frinkiac using the JSON API
 func (c *Client) GetScreenCap(ctx context.Context, season, episode, id string) (*ScreenCapResult, error) {
-	// Construct URL
-	requestURL := fmt.Sprintf("%s/caption/%s%s/%s", c.baseURL, season, episode, id)
-	log.Debug().Str("url", requestURL).Str("season", season).Str("episode", episode).Str("id", id).Msg("sending screen cap request to frinkiac")
+	// Construct URL with query parameters for the API endpoint
+	u, err := url.Parse(fmt.Sprintf("%s/api/caption", c.baseURL))
+	if err != nil {
+		return nil, fmt.Errorf("error parsing URL: %w", err)
+	}
+
+	// Combine season and episode for the 'e' parameter (e.g., S16E01)
+	episodeKey := fmt.Sprintf("%s%s", season, episode)
+
+	q := u.Query()
+	q.Set("e", episodeKey)
+	q.Set("t", id)
+	u.RawQuery = q.Encode()
 
 	// Create request
+	requestURL := u.String()
+	log.Debug().Str("url", requestURL).Str("season", season).Str("episode", episode).Str("id", id).Msg("sending screen cap request to frinkiac API")
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
@@ -40,92 +87,37 @@ func (c *Client) GetScreenCap(ctx context.Context, season, episode, id string) (
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Debug().Int("status_code", resp.StatusCode).Str("url", requestURL).Msg("unexpected status code from frinkiac")
+		log.Debug().Int("status_code", resp.StatusCode).Str("url", requestURL).Msg("unexpected status code from frinkiac API")
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	// Parse HTML response
-	result, err := parseScreenCapResult(resp.Body, season, episode, id)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing response: %w", err)
+	// Parse JSON response
+	var apiCaption APICaption
+	if err := json.NewDecoder(resp.Body).Decode(&apiCaption); err != nil {
+		return nil, fmt.Errorf("error decoding JSON response: %w", err)
 	}
 
-	log.Debug().Str("season", season).Str("episode", episode).Str("id", id).Str("caption", result.Caption).Msg("parsed screen cap result from frinkiac")
-	return result, nil
-}
-
-// parseScreenCapResult parses the HTML response from a screen cap request
-func parseScreenCapResult(body io.Reader, season, episode, id string) (*ScreenCapResult, error) {
-	doc, err := html.Parse(body)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing HTML: %w", err)
+	// Extract caption text from subtitles
+	var captionBuilder strings.Builder
+	for _, subtitle := range apiCaption.Subtitles {
+		if captionBuilder.Len() > 0 {
+			captionBuilder.WriteString(" ")
+		}
+		captionBuilder.WriteString(subtitle.Content)
 	}
+	caption := captionBuilder.String()
+
+	// Construct the image path
+	imagePath := fmt.Sprintf("/img/%s/%d/medium.jpg", apiCaption.Frame.Episode, apiCaption.Frame.Timestamp)
 
 	result := &ScreenCapResult{
-		Season:  season,
-		Episode: episode,
-		ID:      id,
+		ImagePath: imagePath,
+		Caption:   caption,
+		Season:    season,
+		Episode:   episode,
+		ID:        id,
 	}
 
-	// Find the image path
-	var findImage func(*html.Node) bool
-	findImage = func(n *html.Node) bool {
-		if n.Type == html.ElementNode && n.Data == "img" {
-			// Check if this is the main image
-			for _, attr := range n.Attr {
-				if attr.Key == "src" && strings.Contains(attr.Val, fmt.Sprintf("%s%s/%s", season, episode, id)) {
-					result.ImagePath = attr.Val
-					return true
-				}
-			}
-		}
-
-		// Recursively search for the image
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			if findImage(c) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	// Find the caption
-	var findCaption func(*html.Node) bool
-	findCaption = func(n *html.Node) bool {
-		if n.Type == html.ElementNode && n.Data == "div" && hasClass(n, "caption") {
-			var captionText strings.Builder
-			var extractText func(*html.Node)
-			extractText = func(n *html.Node) {
-				if n.Type == html.TextNode {
-					captionText.WriteString(n.Data)
-				}
-				for c := n.FirstChild; c != nil; c = c.NextSibling {
-					extractText(c)
-				}
-			}
-			extractText(n)
-			result.Caption = strings.TrimSpace(captionText.String())
-			return true
-		}
-
-		// Recursively search for the caption
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			if findCaption(c) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	findImage(doc)
-	findCaption(doc)
-
-	// If we didn't find an image path, construct one based on the season, episode, and ID
-	if result.ImagePath == "" {
-		result.ImagePath = fmt.Sprintf("/img/%s%s/%s/medium.jpg", season, episode, id)
-	}
-
+	log.Debug().Str("season", season).Str("episode", episode).Str("id", id).Str("caption", result.Caption).Msg("parsed screen cap result from frinkiac API")
 	return result, nil
 }
