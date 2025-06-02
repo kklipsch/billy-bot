@@ -72,7 +72,7 @@ func (c *Client) GetScreenCap(ctx context.Context, season, episode, id string) (
 
 	// Create request
 	requestURL := u.String()
-	log.Debug().Str("url", requestURL).Str("season", season).Str("episode", episode).Str("id", id).Msg("sending screen cap request to frinkiac API")
+	log.Info().Str("url", requestURL).Str("season", season).Str("episode", episode).Str("id", id).Msg("sending screen cap request to frinkiac API")
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
 	if err != nil {
