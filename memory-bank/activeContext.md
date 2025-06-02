@@ -22,6 +22,10 @@ As the project is in its initial development phase, the recent changes include:
 - Implementing context-based cancellation for graceful shutdown
 - Adding environment variable loading with godotenv
 - Adding GitHub Action for code quality checks (gofmt, golint, and tests)
+- Fixing all golint issues in the codebase:
+  - Adding proper documentation comments to all exported types and functions in the OpenRouter package
+  - Fixing a stuttering function name (renamed OpenRouterCall to Call)
+  - Updating references to the renamed function
 
 ## Next Steps
 

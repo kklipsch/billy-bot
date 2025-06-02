@@ -116,6 +116,8 @@ The project started with a humorous premise: replacing a human (Billy) who was u
    - All tests must pass before merging
    - Tests should use the testify package (require and/or assert) for clearer assertions and better error messages
    - These checks run automatically on push and pull requests
+   - ✅ All exported types and functions now have proper documentation comments
+   - ✅ Fixed stuttering function name (renamed OpenRouterCall to Call)
 
 ### Ongoing Considerations
 
