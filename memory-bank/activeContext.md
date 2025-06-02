@@ -94,6 +94,7 @@ Considering performance aspects:
 - All code must pass golint checks
 - All tests must pass before merging
 - GitHub Actions automatically verify these requirements on push and pull requests
+- Tests should use the testify package (require and/or assert) for clearer assertions and better error messages
 
 ### Error Handling
 - Explicit error checking (Go style)
@@ -140,3 +141,4 @@ Considering performance aspects:
 - Better error messages would improve the user experience (while maintaining the humorous tone at Billy's expense)
 - More consistent integration of the humorous premise throughout the codebase and user experience
 - Development of a "Billy would have failed here" metric to highlight the bot's superiority
+- Refactoring existing tests to use the testify package for improved readability and better failure messages

@@ -58,6 +58,7 @@
 - **github.com/alecthomas/kong v1.11.0**: CLI parsing library
 - **github.com/joho/godotenv v1.5.1**: Environment variable loading from .env files
 - **github.com/rs/zerolog v1.34.0**: Structured logging library
+- **github.com/stretchr/testify v1.10.0**: Testing toolkit with rich assertion capabilities
 - **github.com/kklipsch/billy-bot/pkg/frinkiac**: Internal package for Frinkiac functionality
 - **github.com/kklipsch/billy-bot/pkg/smee**: Internal package for Smee client functionality
 
@@ -112,6 +113,10 @@ Available commands:
 - **Unit Tests**: For testing individual components in isolation
 - **Integration Tests**: For testing interactions between components
 - **End-to-End Tests**: For testing the complete application flow
+- **Testify Package**: The project uses the testify package for writing tests:
+  - `require`: For assertions that should terminate the test immediately if they fail
+  - `assert`: For assertions that should report failures but continue test execution
+  - This approach provides clearer test code and more descriptive error messages
 
 ### Deployment Considerations
 - **Binary Distribution**: As a Go application, it can be compiled into a single binary for easy distribution.

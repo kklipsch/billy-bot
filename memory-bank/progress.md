@@ -22,7 +22,7 @@ As the project is in its initial development phase, the following components are
    - API integration with Frinkiac's JSON endpoint (`/api/search`)
    - URL query construction and parameter handling
    - JSON parsing for extracting screen captures information
-   - Unit tests with saved API responses
+   - Unit tests with saved API responses using testify for clearer assertions
 
 ## What's Left to Build
 
@@ -52,10 +52,11 @@ The following components and features are still pending implementation:
    - Abstraction layer for supporting multiple platforms
 
 5. **Testing Infrastructure**:
-   - ✅ Unit tests for Frinkiac client API integration
+   - ✅ Unit tests for Frinkiac client API integration using testify
    - Integration tests for API interactions
    - End-to-end tests for command execution
    - ✅ Test fixtures for API responses
+   - ✅ Standardized testing approach using testify's require and assert packages
 
 6. **Documentation**:
    - Usage instructions
@@ -84,6 +85,7 @@ As the project is in early development, there are several known issues and limit
 2. **Missing Tests**:
    - Test coverage is limited or non-existent at this stage.
    - ✅ GitHub Action is now in place for automated code quality checks (gofmt, golint, and tests).
+   - ✅ Existing tests have been refactored to use the testify package for improved readability and better failure messages.
 
 3. **Documentation Gaps**:
    - Limited documentation on how to use the application.
@@ -112,6 +114,7 @@ The project started with a humorous premise: replacing a human (Billy) who was u
    - All code must be formatted with gofmt
    - All code must pass golint checks
    - All tests must pass before merging
+   - Tests should use the testify package (require and/or assert) for clearer assertions and better error messages
    - These checks run automatically on push and pull requests
 
 ### Ongoing Considerations

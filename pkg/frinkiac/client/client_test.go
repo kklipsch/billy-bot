@@ -7,6 +7,9 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func ExampleClient_GetQuote() {
@@ -59,35 +62,26 @@ func TestClient(t *testing.T) {
 	// This is just a placeholder test to ensure the package compiles
 	// Real tests would make HTTP requests to the Frinkiac website or use mocks
 	client := New()
-	if client == nil {
-		t.Fatal("Failed to create client")
-	}
+	require.NotNil(t, client, "Failed to create client")
 }
 
 // TestParseAPIResponse tests parsing the API response from a file
 func TestParseAPIResponse(t *testing.T) {
 	// Read the test data file
 	data, err := os.ReadFile("testdata/milhouse_api_response.json")
-	if err != nil {
-		t.Fatalf("Failed to read test data file: %v", err)
-	}
+	require.NoError(t, err, "Failed to read test data file")
 
 	// Parse the JSON data
 	var apiResults []APISearchResult
-	if err := json.Unmarshal(data, &apiResults); err != nil {
-		t.Fatalf("Failed to parse JSON data: %v", err)
-	}
+	err = json.Unmarshal(data, &apiResults)
+	require.NoError(t, err, "Failed to parse JSON data")
 
 	// Verify that we have results
-	if len(apiResults) == 0 {
-		t.Fatal("No results found in test data")
-	}
+	require.NotEmpty(t, apiResults, "No results found in test data")
 
 	// Verify that the first result is from season 16 episode 1
 	firstResult := apiResults[0]
-	if firstResult.Episode != "S16E01" {
-		t.Errorf("Expected first result to be from S16E01, got %s", firstResult.Episode)
-	}
+	assert.Equal(t, "S16E01", firstResult.Episode, "First result should be from S16E01")
 
 	// Verify that several subsequent results are from season 10 episode 19
 	s10e19Count := 0
@@ -96,9 +90,7 @@ func TestParseAPIResponse(t *testing.T) {
 			s10e19Count++
 		}
 	}
-	if s10e19Count < 3 {
-		t.Errorf("Expected several subsequent results to be from S10E19, got %d", s10e19Count)
-	}
+	assert.GreaterOrEqual(t, s10e19Count, 3, "Expected several subsequent results to be from S10E19")
 
 	// Convert API results to QuoteResult objects (similar to what GetQuote does)
 	results := make([]QuoteResult, 0, len(apiResults))
@@ -125,14 +117,11 @@ func TestParseAPIResponse(t *testing.T) {
 	}
 
 	// Verify that the conversion worked correctly
-	if len(results) == 0 {
-		t.Fatal("No results after conversion")
-	}
+	require.NotEmpty(t, results, "No results after conversion")
 
 	// Verify that the first result is from season 16 episode 1
-	if results[0].Season != "S16" || results[0].Episode != "E01" {
-		t.Errorf("Expected first result to be from S16E01, got %s%s", results[0].Season, results[0].Episode)
-	}
+	assert.Equal(t, "S16", results[0].Season, "First result season should be S16")
+	assert.Equal(t, "E01", results[0].Episode, "First result episode should be E01")
 
 	// Verify that several subsequent results are from season 10 episode 19
 	s10e19Count = 0
@@ -141,7 +130,5 @@ func TestParseAPIResponse(t *testing.T) {
 			s10e19Count++
 		}
 	}
-	if s10e19Count < 3 {
-		t.Errorf("Expected several subsequent results to be from S10E19, got %d", s10e19Count)
-	}
+	assert.GreaterOrEqual(t, s10e19Count, 3, "Expected several subsequent results to be from S10E19")
 }
