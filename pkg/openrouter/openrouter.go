@@ -12,7 +12,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func OpenRouterCall[T any](ctx context.Context, apiKey string, req *http.Request, err error, allowedStatus ...int) Response[T] {
+// Call makes an API call to OpenRouter with the provided request.
+// It handles adding default headers, sending the request, and processing the response.
+// The generic type parameter T specifies the expected response type.
+func Call[T any](ctx context.Context, apiKey string, req *http.Request, err error, allowedStatus ...int) Response[T] {
 	if err != nil {
 		return Response[T]{Err: fmt.Errorf("error creating request: %w", err)}
 	}
@@ -22,6 +25,8 @@ func OpenRouterCall[T any](ctx context.Context, apiKey string, req *http.Request
 	return FromResponse[T](ctx, resp, err, allowedStatus...)
 }
 
+// NewRequest creates a new HTTP request for the OpenRouter API.
+// It takes a context, HTTP method, API endpoint, and request body, and returns an HTTP request ready to be sent.
 func NewRequest(ctx context.Context, method string, endpoint string, body any) (*http.Request, error) {
 	requestJSON, err := json.Marshal(body)
 	if err != nil {
@@ -35,6 +40,8 @@ func NewRequest(ctx context.Context, method string, endpoint string, body any) (
 	return http.NewRequestWithContext(ctx, method, url, strings.NewReader(string(requestJSON)))
 }
 
+// AddDefaultHeaders adds the required headers to an HTTP request for the OpenRouter API.
+// It sets the content type, authorization, referer, and title headers.
 func AddDefaultHeaders(APIKey string, req *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+APIKey)
@@ -42,12 +49,18 @@ func AddDefaultHeaders(APIKey string, req *http.Request) {
 	req.Header.Set("X-Title", "Billy Bot")
 }
 
+// Response represents a response from the OpenRouter API.
+// It contains the raw response body, any error that occurred, and the parsed result.
+// The generic type parameter T specifies the expected response type.
 type Response[T any] struct {
 	Body   string
 	Err    error
 	Result T
 }
 
+// FromResponse processes an HTTP response from the OpenRouter API and converts it to a Response object.
+// It handles error checking, response body reading, and JSON unmarshaling.
+// The generic type parameter T specifies the expected response type.
 func FromResponse[T any](ctx context.Context, resp *http.Response, err error, allowedStatus ...int) (oresp Response[T]) {
 	oresp = Response[T]{}
 

@@ -22,7 +22,7 @@ type QuoteResult struct {
 
 // APISearchResult represents a single result from the Frinkiac API search endpoint
 type APISearchResult struct {
-	Id        int    `json:"Id"`
+	ID        int    `json:"Id"`
 	Episode   string `json:"Episode"` // e.g., S16E01
 	Timestamp int    `json:"Timestamp"`
 }
@@ -93,7 +93,7 @@ func (c *Client) GetQuote(ctx context.Context, quote string) ([]QuoteResult, err
 
 		season := apiResult.Episode[:3]  // S16
 		episode := apiResult.Episode[3:] // E01
-		id := fmt.Sprintf("%d", apiResult.Id)
+		id := fmt.Sprintf("%d", apiResult.ID)
 
 		// Construct the image path
 		imagePath := fmt.Sprintf("/img/%s/%s/medium.jpg", apiResult.Episode, id)

@@ -16,6 +16,7 @@ import (
 	"github.com/kklipsch/billy-bot/pkg/smee"
 )
 
+// CLI represents the command-line interface structure for the application
 type CLI struct {
 	Smee     smee.Command     `cmd:"smee" help:"Run the Smee client to receive webhook events."`
 	Frinkiac frinkiac.Command `cmd:"frinkiac" help:"Engage the frinkac tool to find Simpsons scenes."`

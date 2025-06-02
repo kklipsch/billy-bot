@@ -54,7 +54,7 @@ func (s *Command) Run(ctx context.Context) error {
 
 	for ev := range events {
 		// do what you want with the event
-		fmt.Printf("Received event: id=%v, name=%v, payload=%v\n", ev.Id, ev.Name, string(ev.Data))
+		fmt.Printf("Received event: id=%v, name=%v, payload=%v\n", ev.ID, ev.Name, string(ev.Data))
 	}
 
 	return nil
@@ -62,7 +62,7 @@ func (s *Command) Run(ctx context.Context) error {
 
 // Event represents a Server-Sent Event from Smee.io
 type Event struct {
-	Id   string
+	ID   string
 	Name string
 	Data []byte
 }
@@ -95,11 +95,11 @@ func OpenSSEUrl(ctx context.Context, url string) (<-chan Event, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Error: resp.StatusCode == %d\n", resp.StatusCode)
+		return nil, fmt.Errorf("status code %d", resp.StatusCode)
 	}
 
 	if resp.Header.Get("Content-Type") != "text/event-stream" {
-		return nil, fmt.Errorf("Error: invalid Content-Type == %s\n", resp.Header.Get("Content-Type"))
+		return nil, fmt.Errorf("invalid content-type %s", resp.Header.Get("Content-Type"))
 	}
 
 	events := make(chan Event)
@@ -117,7 +117,7 @@ func OpenSSEUrl(ctx context.Context, url string) (<-chan Event, error) {
 
 			// start of event
 			case bytes.HasPrefix(line, []byte("id:")):
-				ev.Id = string(line[4:])
+				ev.ID = string(line[4:])
 
 				// event name
 			case bytes.HasPrefix(line, []byte("event:")):

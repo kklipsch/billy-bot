@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	// FrinkiacResponseSchema defines the JSON schema for validating responses from the Frinkiac API
 	FrinkiacResponseSchema = jsonschema.NewArraySchema(
 		jsonschema.NewObjectSchema(
 			map[string]*jsonschema.Schema{
@@ -26,6 +27,7 @@ var (
 		),
 	)
 
+	// FrinkiacPrompt is the system prompt used to instruct the AI model about Simpsons quotes
 	FrinkiacPrompt = openrouter.ChatMessage{
 		Role: "system",
 		Content: `You are a helpful assistant with encyclopedic knowledge of The Simpsons. 
@@ -75,7 +77,7 @@ func (o *Command) Run(ctx context.Context) error {
 	}
 
 	req, err := openrouter.NewChatCompletionReq(ctx, request)
-	result := openrouter.OpenRouterCall[openrouter.ChatCompletionResponse](ctx, apiKey, req, err, http.StatusOK)
+	result := openrouter.Call[openrouter.ChatCompletionResponse](ctx, apiKey, req, err, http.StatusOK)
 	if result.Err != nil {
 		return result.Err
 	}

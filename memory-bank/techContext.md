@@ -45,7 +45,7 @@
 
 ### External Website Limitations
 - **Frinkiac Website Rate Limits**: The bot's operation may be constrained by any rate limits or anti-scraping measures imposed by the Frinkiac website.
-- **HTML Parsing Challenges**: Since Frinkiac returns HTML designed for humans, the bot will need to parse this HTML to extract the relevant screen captures.
+- **HTML Parsing Challenges**: Frinkiac has an undocumented api, it presents as a full page app so discovering the api is a challenge. 
 - **Webhook Processing Capacity**: The number of webhook events that can be processed simultaneously may be limited by system resources.
 
 ### Security Considerations
