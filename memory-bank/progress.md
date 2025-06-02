@@ -72,6 +72,7 @@ As the project is in early development, there are several known issues and limit
    - The core functionality of categorizing prompts into Simpson's quotes is still under development.
    - The GitHub integration is not yet implemented.
    - The Smee client is only an early prototype for webhook testing.
+   - The Frinkiac client successfully sends requests to the Frinkiac website, but the HTML parsing logic is not correctly extracting screen captures from the responses. Example query `https://frinkiac.com/?q=Everything%27s+coming+up+Milhouse%21` returns screen caps that our parser is not detecting.
 
 2. **Missing Tests**:
    - Test coverage is limited or non-existent at this stage.
@@ -102,7 +103,7 @@ The project started with a humorous premise: replacing a human (Billy) who was u
 
 ### Ongoing Considerations
 
-1. **Web Scraping Strategy**: The team is still evaluating the best approach for interacting with the Frinkiac website, considering factors like HTML parsing techniques, handling website structure changes, and implementing respectful scraping practices.
+1. **Web Scraping Strategy**: The team is still evaluating the best approach for interacting with the Frinkiac website, considering factors like HTML parsing techniques, handling website structure changes, and implementing respectful scraping practices. Current implementation includes debug logging to help diagnose HTML parsing issues.
 
 2. **Command Structure**: Decisions about the optimal command structure and options for the CLI are still being made, including parameters for the Frinkiac command and output format options.
 

@@ -61,6 +61,8 @@ Currently evaluating the best approach for interacting with the Frinkiac website
 - Caching strategy for frequently requested quotes
 - Error handling for failed requests or unexpected HTML structures
 
+**Current Status**: We have implemented a client that successfully sends quote requests to Frinkiac (e.g., `https://frinkiac.com/?q=Everything%27s+coming+up+Milhouse%21`), but our HTML parsing logic is not correctly extracting the screen captures from the responses. The client includes debug logging to help diagnose the issue. We need to investigate the HTML structure of the Frinkiac website more carefully to fix the parsing logic.
+
 ### Command Structure
 Deciding on the optimal command structure and options for the CLI:
 - What parameters should be available for the Frinkiac command
