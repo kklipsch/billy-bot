@@ -53,15 +53,15 @@ The immediate next steps for the project are:
 
 ## Active Decisions and Considerations
 
-### Web Scraping Strategy
-Currently evaluating the best approach for interacting with the Frinkiac website:
-- HTML parsing techniques and libraries
-- Handling of website structure changes
-- Rate limiting and respectful scraping practices
-- Caching strategy for frequently requested quotes
-- Error handling for failed requests or unexpected HTML structures
+### Frinkiac Integration Strategy
+We've updated our approach for interacting with the Frinkiac website:
+- Discovered and implemented the Frinkiac JSON API endpoint (`/api/search`) instead of HTML parsing
+- Created structured data types to represent the API response
+- Implemented proper JSON parsing and conversion to our internal data structures
+- Added unit tests with saved API responses to ensure correct parsing
+- Maintained compatibility with existing code that uses the parsed results
 
-**Current Status**: We have implemented a client that successfully sends quote requests to Frinkiac (e.g., `https://frinkiac.com/?q=Everything%27s+coming+up+Milhouse%21`), but our HTML parsing logic is not correctly extracting the screen captures from the responses. The client includes debug logging to help diagnose the issue. We need to investigate the HTML structure of the Frinkiac website more carefully to fix the parsing logic.
+**Current Status**: We have implemented a client that successfully sends quote requests to the Frinkiac API (e.g., `https://frinkiac.com/api/search?q=Everything%27s+coming+up+Milhouse%21`) and correctly parses the JSON response. The client now extracts season, episode, and ID information from the API response and constructs the appropriate image paths. This is more robust than the previous HTML parsing approach since it uses a structured API response rather than trying to parse dynamically generated HTML.
 
 ### Command Structure
 Deciding on the optimal command structure and options for the CLI:

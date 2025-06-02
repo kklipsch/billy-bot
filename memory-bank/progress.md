@@ -17,14 +17,20 @@ As the project is in its initial development phase, the following components are
    - Basic package organization
    - Command pattern implementation
 
+3. **Frinkiac Integration**:
+   - API integration with Frinkiac's JSON endpoint (`/api/search`)
+   - URL query construction and parameter handling
+   - JSON parsing for extracting screen captures information
+   - Unit tests with saved API responses
+
 ## What's Left to Build
 
 The following components and features are still pending implementation:
 
 1. **Frinkiac Integration**:
-   - Web scraping functionality for the Frinkiac website
-   - URL query construction (e.g., `https://frinkiac.com/?q=quote`)
-   - HTML parsing for extracting screen captures
+   - ✅ API integration with Frinkiac's JSON endpoint (`/api/search`)
+   - ✅ URL query construction (e.g., `https://frinkiac.com/api/search?q=quote`)
+   - ✅ JSON parsing for extracting screen captures information
    - Result formatting and presentation
 
 2. **GitHub Integration** (Primary Goal):
@@ -45,10 +51,10 @@ The following components and features are still pending implementation:
    - Abstraction layer for supporting multiple platforms
 
 5. **Testing Infrastructure**:
-   - Unit tests for core functionality
+   - ✅ Unit tests for Frinkiac client API integration
    - Integration tests for API interactions
    - End-to-end tests for command execution
-   - Test fixtures and mocks
+   - ✅ Test fixtures for API responses
 
 6. **Documentation**:
    - Usage instructions
@@ -72,7 +78,7 @@ As the project is in early development, there are several known issues and limit
    - The core functionality of categorizing prompts into Simpson's quotes is still under development.
    - The GitHub integration is not yet implemented.
    - The Smee client is only an early prototype for webhook testing.
-   - The Frinkiac client successfully sends requests to the Frinkiac website, but the HTML parsing logic is not correctly extracting screen captures from the responses. Example query `https://frinkiac.com/?q=Everything%27s+coming+up+Milhouse%21` returns screen caps that our parser is not detecting.
+   - ✅ The Frinkiac client now successfully retrieves and parses results from the Frinkiac API endpoint. We've switched from HTML parsing to using the JSON API at `/api/search`, which provides more reliable and structured data.
 
 2. **Missing Tests**:
    - Test coverage is limited or non-existent at this stage.
@@ -99,11 +105,16 @@ The project started with a humorous premise: replacing a human (Billy) who was u
 
 4. **Command Pattern**: The decision to use the command pattern for CLI interactions provides a clean separation of concerns and makes it easier to add new functionality in the future.
 
-5. **Web Scraping Integration**: Rather than implementing screen cap selection from scratch, the project leverages the existing Frinkiac website through web scraping, focusing on the prompt categorization and HTML parsing aspects.
+5. **Frinkiac API Integration**: Rather than implementing screen cap selection from scratch, the project leverages the existing Frinkiac website through its JSON API, focusing on the prompt categorization and structured data parsing. This approach was updated from the initial HTML scraping strategy to provide more reliable results.
 
 ### Ongoing Considerations
 
-1. **Web Scraping Strategy**: The team is still evaluating the best approach for interacting with the Frinkiac website, considering factors like HTML parsing techniques, handling website structure changes, and implementing respectful scraping practices. Current implementation includes debug logging to help diagnose HTML parsing issues.
+1. **Frinkiac Integration Strategy**: We've updated our approach for interacting with the Frinkiac website from HTML parsing to using the JSON API endpoint. This provides several advantages:
+   - More reliable data extraction with structured JSON responses
+   - Less susceptibility to website UI changes
+   - Cleaner code with standard JSON parsing instead of complex HTML traversal
+   - Better performance with smaller response payloads
+   - Easier testing with predictable response formats
 
 2. **Command Structure**: Decisions about the optimal command structure and options for the CLI are still being made, including parameters for the Frinkiac command and output format options.
 
