@@ -119,6 +119,15 @@ Considering performance aspects:
 - Self-documenting help text
 - Intuitive option naming
 
+### Git Workflow
+- For each new task:
+  1. Checkout the most recent code on a new branch with a sensible name related to the task
+  2. Make all necessary changes to complete the task
+  3. Commit with a sensible commit message, including a note that the commit was generated via Cline
+  4. Push the new branch to origin
+  5. Create a pull request to merge into the main branch
+  6. Share the link to the PR
+
 ### Project Tone and Communication Style
 - Maintain a humorous tone that playfully mocks Billy throughout the codebase and user-facing elements
 - Include subtle jabs at Billy's expense in error messages, logs, and output
