@@ -88,7 +88,7 @@ As the project is in early development, there are several known issues and limit
 ## Evolution of Project Decisions
 
 ### Initial Concept
-The project started with a humorous premise: replacing a human (Billy) who was unreliable in providing Simpsons screen captures with a bot that would consistently deliver appropriate references.
+The project started with a humorous premise: replacing a human (Billy) who was unreliable in providing Simpsons screen captures with a bot that would consistently deliver appropriate references. This joke at Billy's expense is not just a footnote but a fundamental aspect of the project's identity - the bot exists specifically to mock Billy's unreliability and "replace" him with superior technology.
 
 ### Technical Approach
 1. **Language Selection**: Go was chosen for its simplicity, performance, and strong concurrency support, which is well-suited for handling webhook events and API interactions.
@@ -111,6 +111,15 @@ The project started with a humorous premise: replacing a human (Billy) who was u
 
 4. **Performance Optimization**: Considerations about response time targets, concurrency models, and resource usage constraints are ongoing.
 
+### Humor as a Design Principle
+Throughout development, the project has maintained its humorous foundation:
+- Error messages and logs are designed with subtle jabs at Billy's expense
+- The bot's superiority over Billy is emphasized in various aspects of the design
+- User-facing elements maintain the comedic premise of Billy being replaced
+- Technical decisions are made with consideration for how they support the joke
+
+This humorous approach isn't merely decorative - it informs design decisions, communication style, and feature prioritization. The project team recognizes that while building a technically sound application is important, maintaining the comedic premise of making fun of Billy is equally essential to the project's success.
+
 ### Future Direction
 
 The project roadmap suggests a phased approach:
@@ -119,4 +128,6 @@ The project roadmap suggests a phased approach:
 3. If successful, expand to include Discord and Slack integrations.
 4. Finally, consider additional features like more sophisticated matching algorithms, caching, and potentially a web interface.
 
-This incremental approach allows for early validation of the core concept before investing in more complex features and additional platform integrations.
+Throughout all phases, the project will maintain its humorous tone and continue to emphasize how the bot outperforms Billy in every metric. This includes potentially developing a "Billy would have failed here" metric to highlight situations where the bot succeeds where Billy would have likely failed.
+
+This incremental approach allows for early validation of the core concept before investing in more complex features and additional platform integrations, while ensuring the humorous premise remains central to the project's identity.

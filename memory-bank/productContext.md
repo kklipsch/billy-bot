@@ -2,13 +2,13 @@
 
 ## Why This Project Exists
 
-Billy Bot was created out of necessity and a touch of humor. The project originated from a recurring problem: relying on a person named Billy to provide appropriate Simpsons screen captures for various situations, only to be "left hanging" repeatedly. As the README humorously states: "billy has left me hanging once again. Well fool me once shame on you, fool me can't be fooled again. I'm going to replace Billy's most important skill, being able to pick the correct Simpson's screen cap for any occasion, with a bot so that I'll never be deserted again."
+Billy Bot was created out of necessity and a healthy dose of humor at Billy's expense. The project originated from a recurring problem: relying on a person named Billy to provide appropriate Simpsons screen captures for various situations, only to be "left hanging" repeatedly. As the README humorously states: "billy has left me hanging once again. Well fool me once shame on you, fool me can't be fooled again. I'm going to replace Billy's most important skill, being able to pick the correct Simpson's screen cap for any occasion, with a bot so that I'll never be deserted again."
 
-This project represents a practical solution to ensure that users always have access to the perfect Simpsons reference, regardless of human availability or reliability.
+This project is fundamentally a joke with Billy as the butt of it - a comedic revenge plot wrapped in a software development project. While it serves the practical purpose of ensuring users always have access to the perfect Simpsons reference, it's equally important to remember that mocking Billy's unreliability and "replacing" him with superior technology is a core part of the project's identity and humor.
 
 ## Problems It Solves
 
-1. **Dependency on Unreliable Human Resources**: Eliminates the need to rely on a specific person (Billy) for Simpsons references, who may not always be available or responsive.
+1. **Dependency on Unreliable Human Resources**: Eliminates the need to rely on a specific person (Billy) for Simpsons references, who may not always be available or responsive. Billy's chronic unreliability is both the inspiration for and ongoing joke of this project.
 
 2. **Consistency in Reference Quality**: Ensures consistent quality in the selection of Simpsons references, rather than being subject to a human's varying levels of attention or expertise.
 
@@ -75,4 +75,18 @@ The success of Billy Bot as a product will be measured by:
 
 4. **Reliability**: The system's uptime and consistent performance in providing references.
 
-5. **Comparison to Human Alternative**: How the system compares to the human (Billy) in terms of response time, accuracy, and availability.
+5. **Comparison to Human Alternative**: How the system compares to the human (Billy) in terms of response time, accuracy, and availability - with the expectation that the bot will consistently outperform Billy in every metric, further emphasizing the humorous premise that Billy is being technologically obsoleted.
+
+## Humor and Tone
+
+The Billy Bot project embraces a comedic tone that playfully mocks Billy's unreliability. This humorous approach should be maintained throughout all aspects of the project:
+
+1. **Self-Aware Mockery**: The bot should occasionally reference its own existence as a replacement for Billy, with tongue-in-cheek comments about its superior reliability.
+
+2. **Playful Jabs**: Error messages, success notifications, and other user-facing text should include subtle jabs at Billy's expense when appropriate.
+
+3. **"Billy Would Have Failed"**: The project should occasionally highlight situations where Billy would have likely failed to deliver, but the bot succeeds.
+
+4. **Inside Joke Continuity**: The ongoing joke about Billy's unreliability should be treated as a running gag that evolves over time but remains central to the project's identity.
+
+This humorous foundation is not merely decorative - it's a fundamental aspect of the project that should inform design decisions, communication style, and feature prioritization.
