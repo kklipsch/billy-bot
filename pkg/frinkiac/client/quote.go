@@ -45,36 +45,26 @@ func hasClass(n *html.Node, class string) bool {
 
 // GetQuote searches for a quote on Frinkiac and returns the results
 func (c *Client) GetQuote(ctx context.Context, quote string) ([]QuoteResult, error) {
-	// Construct URL with query parameter for the API endpoint
-	u, err := url.Parse(fmt.Sprintf("%s/api/search", c.baseURL))
-	if err != nil {
-		return nil, fmt.Errorf("error parsing URL: %w", err)
+	// Set up query parameters
+	queryParams := url.Values{}
+	queryParams.Set("q", quote)
+
+	// Set up log context
+	logContext := map[string]interface{}{
+		"quote": quote,
 	}
 
-	q := u.Query()
-	q.Set("q", quote)
-	u.RawQuery = q.Encode()
-
-	// Create request
-	requestURL := u.String()
-	log.Debug().Str("url", requestURL).Str("quote", quote).Msg("sending quote request to frinkiac API")
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
+	// Make the request
+	resp, err := c.doRequest(ctx, RequestOptions{
+		Method:      http.MethodGet,
+		Path:        "/api/search",
+		QueryParams: queryParams,
+		LogContext:  logContext,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating request: %w", err)
-	}
-
-	// Send request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error sending request: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		log.Debug().Int("status_code", resp.StatusCode).Str("url", requestURL).Msg("unexpected status code from frinkiac API")
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
 
 	// Parse JSON response
 	var apiResults []APISearchResult
@@ -93,7 +83,7 @@ func (c *Client) GetQuote(ctx context.Context, quote string) ([]QuoteResult, err
 
 		season := apiResult.Episode[:3]  // S16
 		episode := apiResult.Episode[3:] // E01
-		id := fmt.Sprintf("%d", apiResult.ID)
+		id := fmt.Sprintf("%d", apiResult.Timestamp)
 
 		// Construct the image path
 		imagePath := fmt.Sprintf("/img/%s/%s/medium.jpg", apiResult.Episode, id)
