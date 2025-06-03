@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/kklipsch/billy-bot/pkg/config"
 	"github.com/kklipsch/billy-bot/pkg/frinkiac/client"
@@ -129,15 +132,96 @@ func (o *Command) Run(ctx context.Context) error {
 				result := results[0]
 				fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", result.Season, result.Episode, result.ID)
 
-				// Get the screen cap
-				screenCap, err := frinkiacClient.GetScreenCap(ctx, result.Season, result.Episode, result.ID)
+				// Get the timestamp from the ID
+				// The Frinkiac API uses timestamps, not IDs, for captions
+				// Let's try to get the caption directly from the API
+
+				// We need to get the actual timestamp from the API
+				searchURL := fmt.Sprintf("%s/api/search?q=%s", client.BaseURL, url.QueryEscape(quote.Quote))
+				searchResp, err := http.Get(searchURL)
 				if err != nil {
-					fmt.Printf("   Error getting screen cap: %v\n", err)
+					fmt.Printf("   Error getting timestamp: %v\n", err)
+					continue
+				}
+				defer searchResp.Body.Close()
+
+				if searchResp.StatusCode != http.StatusOK {
+					fmt.Printf("   Error getting timestamp: status code %d\n", searchResp.StatusCode)
 					continue
 				}
 
-				fmt.Printf("   Caption: %s\n", screenCap.Caption)
-				fmt.Printf("   Image URL: %s%s\n", client.BaseURL, screenCap.ImagePath)
+				// Parse the search results to get the timestamp
+				var searchResults []struct {
+					Id        int    `json:"Id"`
+					Episode   string `json:"Episode"`
+					Timestamp int    `json:"Timestamp"`
+				}
+				if err := json.NewDecoder(searchResp.Body).Decode(&searchResults); err != nil {
+					fmt.Printf("   Error parsing search results: %v\n", err)
+					continue
+				}
+
+				// Find the matching ID to get the timestamp
+				var timestamp string
+				idInt, err := strconv.Atoi(result.ID)
+				if err == nil {
+					for _, sr := range searchResults {
+						if sr.Id == idInt {
+							timestamp = fmt.Sprintf("%d", sr.Timestamp)
+							break
+						}
+					}
+				}
+
+				if timestamp == "" {
+					fmt.Printf("   Error: could not find timestamp for ID %s\n", result.ID)
+					continue
+				}
+
+				// Get the caption using the timestamp
+				apiURL := fmt.Sprintf("%s/api/caption?e=%s%s&t=%s", client.BaseURL, result.Season, result.Episode, timestamp)
+				resp, err := http.Get(apiURL)
+				if err != nil {
+					fmt.Printf("   Error getting caption: %v\n", err)
+					continue
+				}
+				defer resp.Body.Close()
+
+				if resp.StatusCode != http.StatusOK {
+					fmt.Printf("   Error getting caption: status code %d\n", resp.StatusCode)
+					continue
+				}
+
+				// Parse the JSON response
+				var apiCaption struct {
+					Subtitles []struct {
+						Content string `json:"Content"`
+					} `json:"Subtitles"`
+				}
+
+				if err := json.NewDecoder(resp.Body).Decode(&apiCaption); err != nil {
+					fmt.Printf("   Error parsing caption: %v\n", err)
+					continue
+				}
+
+				// Extract the caption text
+				var captionBuilder strings.Builder
+				for _, subtitle := range apiCaption.Subtitles {
+					if captionBuilder.Len() > 0 {
+						captionBuilder.WriteString(" ")
+					}
+					captionBuilder.WriteString(subtitle.Content)
+				}
+				caption := captionBuilder.String()
+
+				fmt.Printf("   Caption: %s\n", caption)
+
+				// Ensure the image URL is properly constructed with the base URL
+				// The correct image URL format is https://frinkiac.com/img/S16E01/408242.jpg
+				// Not https://frinkiac.com/img/S16E01/408242/medium.jpg
+				imagePath := fmt.Sprintf("/img/%s%s/%s.jpg", result.Season, result.Episode, timestamp)
+				imageURL := fmt.Sprintf("%s%s", client.BaseURL, imagePath)
+				fmt.Printf("   Image URL: %s\n", imageURL)
 			} else {
 				fmt.Println("   No screen caps found for this quote")
 			}
@@ -154,15 +238,96 @@ func (o *Command) Run(ctx context.Context) error {
 				result := results[0]
 				fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", result.Season, result.Episode, result.ID)
 
-				// Get the screen cap
-				screenCap, err := frinkiacClient.GetScreenCap(ctx, result.Season, result.Episode, result.ID)
+				// Get the timestamp from the ID
+				// The Frinkiac API uses timestamps, not IDs, for captions
+				// Let's try to get the caption directly from the API
+
+				// We need to get the actual timestamp from the API
+				searchURL := fmt.Sprintf("%s/api/search?q=%s", client.BaseURL, url.QueryEscape(quote.Quote))
+				searchResp, err := http.Get(searchURL)
 				if err != nil {
-					fmt.Printf("   Error getting screen cap: %v\n", err)
+					fmt.Printf("   Error getting timestamp: %v\n", err)
+					continue
+				}
+				defer searchResp.Body.Close()
+
+				if searchResp.StatusCode != http.StatusOK {
+					fmt.Printf("   Error getting timestamp: status code %d\n", searchResp.StatusCode)
 					continue
 				}
 
-				fmt.Printf("   Caption: %s\n", screenCap.Caption)
-				fmt.Printf("   Image URL: %s%s\n", client.BaseURL, screenCap.ImagePath)
+				// Parse the search results to get the timestamp
+				var searchResults []struct {
+					Id        int    `json:"Id"`
+					Episode   string `json:"Episode"`
+					Timestamp int    `json:"Timestamp"`
+				}
+				if err := json.NewDecoder(searchResp.Body).Decode(&searchResults); err != nil {
+					fmt.Printf("   Error parsing search results: %v\n", err)
+					continue
+				}
+
+				// Find the matching ID to get the timestamp
+				var timestamp string
+				idInt, err := strconv.Atoi(result.ID)
+				if err == nil {
+					for _, sr := range searchResults {
+						if sr.Id == idInt {
+							timestamp = fmt.Sprintf("%d", sr.Timestamp)
+							break
+						}
+					}
+				}
+
+				if timestamp == "" {
+					fmt.Printf("   Error: could not find timestamp for ID %s\n", result.ID)
+					continue
+				}
+
+				// Get the caption using the timestamp
+				apiURL := fmt.Sprintf("%s/api/caption?e=%s%s&t=%s", client.BaseURL, result.Season, result.Episode, timestamp)
+				resp, err := http.Get(apiURL)
+				if err != nil {
+					fmt.Printf("   Error getting caption: %v\n", err)
+					continue
+				}
+				defer resp.Body.Close()
+
+				if resp.StatusCode != http.StatusOK {
+					fmt.Printf("   Error getting caption: status code %d\n", resp.StatusCode)
+					continue
+				}
+
+				// Parse the JSON response
+				var apiCaption struct {
+					Subtitles []struct {
+						Content string `json:"Content"`
+					} `json:"Subtitles"`
+				}
+
+				if err := json.NewDecoder(resp.Body).Decode(&apiCaption); err != nil {
+					fmt.Printf("   Error parsing caption: %v\n", err)
+					continue
+				}
+
+				// Extract the caption text
+				var captionBuilder strings.Builder
+				for _, subtitle := range apiCaption.Subtitles {
+					if captionBuilder.Len() > 0 {
+						captionBuilder.WriteString(" ")
+					}
+					captionBuilder.WriteString(subtitle.Content)
+				}
+				caption := captionBuilder.String()
+
+				fmt.Printf("   Caption: %s\n", caption)
+
+				// Ensure the image URL is properly constructed with the base URL
+				// The correct image URL format is https://frinkiac.com/img/S16E01/408242.jpg
+				// Not https://frinkiac.com/img/S16E01/408242/medium.jpg
+				imagePath := fmt.Sprintf("/img/%s%s/%s.jpg", result.Season, result.Episode, timestamp)
+				imageURL := fmt.Sprintf("%s%s", client.BaseURL, imagePath)
+				fmt.Printf("   Image URL: %s\n", imageURL)
 			} else {
 				fmt.Println("   No screen caps found for this quote")
 			}
