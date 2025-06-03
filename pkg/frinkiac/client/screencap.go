@@ -25,7 +25,7 @@ type ScreenCapResult struct {
 // APICaption represents the response from the Frinkiac API caption endpoint
 type APICaption struct {
 	Episode struct {
-		Id              int    `json:"Id"`
+		ID              int    `json:"Id"`
 		Key             string `json:"Key"`
 		Season          int    `json:"Season"`
 		EpisodeNumber   int    `json:"EpisodeNumber"`
@@ -36,12 +36,12 @@ type APICaption struct {
 		WikiLink        string `json:"WikiLink"`
 	} `json:"Episode"`
 	Frame struct {
-		Id        int    `json:"Id"`
+		ID        int    `json:"Id"`
 		Episode   string `json:"Episode"`
 		Timestamp int    `json:"Timestamp"`
 	} `json:"Frame"`
 	Subtitles []struct {
-		Id                      int    `json:"Id"`
+		ID                      int    `json:"Id"`
 		RepresentativeTimestamp int    `json:"RepresentativeTimestamp"`
 		Episode                 string `json:"Episode"`
 		StartTimestamp          int    `json:"StartTimestamp"`
@@ -50,7 +50,7 @@ type APICaption struct {
 		Language                string `json:"Language"`
 	} `json:"Subtitles"`
 	Nearby []struct {
-		Id        int    `json:"Id"`
+		ID        int    `json:"Id"`
 		Episode   string `json:"Episode"`
 		Timestamp int    `json:"Timestamp"`
 	} `json:"Nearby"`
@@ -70,6 +70,7 @@ func (c *Client) GetScreenCap(ctx context.Context, season, episode, id string) (
 
 // getScreenCapFromAPI gets a screen cap from Frinkiac using the JSON API
 func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id string) (*ScreenCapResult, error) {
+
 	// We need to convert the ID to a timestamp for the API
 	// First, try to directly use the ID as a timestamp
 	timestamp := id
@@ -95,14 +96,34 @@ func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id st
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
+  }
+	// Combine season and episode for the 'e' parameter (e.g., S16E01)
+	episodeKey := fmt.Sprintf("%s%s", season, episode)
+
+	// Set up query parameters
+	queryParams := url.Values{}
+	queryParams.Set("e", episodeKey)
+	queryParams.Set("t", id)
+
+	// Set up log context
+	logContext := map[string]interface{}{
+		"season":  season,
+		"episode": episode,
+		"id":      id,
 	}
 
-	// Send request
-	resp, err := c.httpClient.Do(req)
+	// Make the request
+	resp, err := c.doRequest(ctx, RequestOptions{
+		Method:      http.MethodGet,
+		Path:        "/api/caption",
+		QueryParams: queryParams,
+		LogContext:  logContext,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("error sending request: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
+
 
 	// If we get a 404, try to search for the frame using the episode
 	if resp.StatusCode == http.StatusNotFound {
@@ -192,6 +213,7 @@ func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id st
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
+
 	// Parse JSON response
 	var apiCaption APICaption
 	if err := json.NewDecoder(resp.Body).Decode(&apiCaption); err != nil {
@@ -225,27 +247,25 @@ func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id st
 
 // getScreenCapFromHTML gets a screen cap from Frinkiac using the HTML endpoint
 func (c *Client) getScreenCapFromHTML(ctx context.Context, season, episode, id string) (*ScreenCapResult, error) {
-	// Construct URL for the HTML endpoint
-	requestURL := fmt.Sprintf("%s/caption/%s%s/%s", c.baseURL, season, episode, id)
-	log.Info().Str("url", requestURL).Str("season", season).Str("episode", episode).Str("id", id).Msg("sending screen cap request to frinkiac HTML endpoint")
+	// Set up log context
+	logContext := map[string]interface{}{
+		"season":  season,
+		"episode": episode,
+		"id":      id,
+		"type":    "HTML",
+	}
 
-	// Create request
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
+	// Make the request
+	path := fmt.Sprintf("/caption/%s%s/%s", season, episode, id)
+	resp, err := c.doRequest(ctx, RequestOptions{
+		Method:     http.MethodGet,
+		Path:       path,
+		LogContext: logContext,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating request: %w", err)
+		return nil, err
 	}
-
-	// Send request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error sending request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		log.Debug().Int("status_code", resp.StatusCode).Str("url", requestURL).Msg("unexpected status code from frinkiac HTML endpoint")
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
+	resp.Body.Close()
 
 	// Parse HTML to extract caption
 	doc, err := html.Parse(resp.Body)
