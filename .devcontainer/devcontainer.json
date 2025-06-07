@@ -8,7 +8,8 @@
 		"ghcr.io/devcontainers/features/git:1": {
 			"version": "latest",
 			"ppa": "false"
-		}
+		},
+		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
 	},
 	"customizations": {
 		"vscode": {
@@ -20,7 +21,7 @@
 				"go.formatTool": "gofmt",
 				"editor.formatOnSave": true,
 				"editor.codeActionsOnSave": {
-					"source.organizeImports": true 
+					"source.organizeImports": "always"
 				}
 			},
 			"extensions": [
