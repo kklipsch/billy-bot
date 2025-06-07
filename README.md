@@ -12,4 +12,4 @@ Categorize a prompt into a Simpson's quote.
 
 ## Development
 
-We attempt to keep the dev contaienr up to date.
+We attempt to keep the dev container up to date.
