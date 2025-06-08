@@ -16,7 +16,7 @@ go run main.go smee                        # Run smee webhook listener
 
 # Testing
 go test ./...                              # Run all tests
-go test ./pkg/frinkiac/client/             # Run specific package tests
+go test ./pkg/frinkiac/http/               # Run specific package tests
 
 # Code quality (used in CI)
 gofmt -s -w .                              # Format code
@@ -63,7 +63,7 @@ golint ./...
 ### Testing Strategy
 - Unit tests use testify framework (require/assert patterns)
 - HTTP client mocking for external API testing
-- Test data in `/pkg/frinkiac/client/testdata/`
+- Test data in `/pkg/frinkiac/http/testdata/`
 - Integration tests with real API responses
 
 ## Environment Setup

@@ -5,9 +5,8 @@ import (
 	"fmt"
 
 	"github.com/kklipsch/billy-bot/pkg/config"
-	"github.com/kklipsch/billy-bot/pkg/frinkiac/client"
+	"github.com/kklipsch/billy-bot/pkg/frinkiac/http"
 )
-
 
 // Command represents the CLI command for OpenRouter
 type Command struct {
@@ -15,7 +14,6 @@ type Command struct {
 	Model  string `default:"openrouter/auto" help:"The model to use."`
 	APIKey string `name:"api-key" short:"k" help:"OpenRouter API key. If not provided, OPENROUTER_API_KEY env var is used."`
 }
-
 
 // Run executes the OpenRouter command
 func (o *Command) Run(ctx context.Context) error {
@@ -30,7 +28,7 @@ func (o *Command) Run(ctx context.Context) error {
 	}
 
 	// Create a Frinkiac client
-	frinkiacClient := client.New()
+	frinkiacClient := http.New()
 
 	// Process each quote
 	fmt.Println("Quotes found:")
@@ -64,7 +62,7 @@ func (o *Command) Run(ctx context.Context) error {
 				}
 
 				fmt.Printf("   Caption: %s\n", screenCap.Caption)
-				fmt.Printf("   Image URL: %s%s\n", client.BaseURL, screenCap.ImagePath)
+				fmt.Printf("   Image URL: %s%s\n", http.BaseURL, screenCap.ImagePath)
 			} else {
 				fmt.Println("   No screen caps found for this quote")
 			}
@@ -89,7 +87,7 @@ func (o *Command) Run(ctx context.Context) error {
 				}
 
 				fmt.Printf("   Caption: %s\n", screenCap.Caption)
-				fmt.Printf("   Image URL: %s%s\n", client.BaseURL, screenCap.ImagePath)
+				fmt.Printf("   Image URL: %s%s\n", http.BaseURL, screenCap.ImagePath)
 			} else {
 				fmt.Println("   No screen caps found for this quote")
 			}
