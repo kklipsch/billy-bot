@@ -61,7 +61,7 @@ func ExampleGetScreenCap() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := GetScreenCap(ctx, client, config, "S09", "E22", "202334")
+	result, err := GetScreenCap(ctx, client, config, "S09", "E22", 202334)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return

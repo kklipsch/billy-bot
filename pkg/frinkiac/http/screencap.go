@@ -55,7 +55,10 @@ type APICaption struct {
 }
 
 // GetScreenCap gets a screen cap from Frinkiac
-func GetScreenCap(ctx context.Context, client *http.Client, config Config, season, episode, id string) (*ScreenCapResult, error) {
+func GetScreenCap(ctx context.Context, client *http.Client, config Config, season, episode string, timestamp int) (*ScreenCapResult, error) {
+	// Convert timestamp to string for internal functions
+	id := fmt.Sprintf("%d", timestamp)
+
 	// First try the JSON API endpoint
 	result, err := getScreenCapFromAPI(ctx, client, config, season, episode, id)
 	if err != nil {

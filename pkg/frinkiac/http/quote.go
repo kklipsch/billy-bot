@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"golang.org/x/net/html"
 )
 
@@ -20,11 +19,20 @@ type APISearchResult struct {
 	Timestamp int    `json:"Timestamp"`
 }
 
+// validateEpisodeFormat checks if the episode format is valid
+// Episode format is expected to be like "S16E01"
+func validateEpisodeFormat(episode string) error {
+	if len(episode) < 6 {
+		return fmt.Errorf("invalid episode format: %s", episode)
+	}
+	return nil
+}
+
 // GetSeasonAndEpisode extracts season and episode numbers from an APISearchResult
 // Episode format is expected to be like "S16E01"
 func GetSeasonAndEpisode(result APISearchResult) (season int, episode int, err error) {
-	if len(result.Episode) < 6 {
-		return 0, 0, fmt.Errorf("invalid episode format: %s", result.Episode)
+	if err := validateEpisodeFormat(result.Episode); err != nil {
+		return 0, 0, err
 	}
 
 	// Extract season number from "S16" part
@@ -47,12 +55,10 @@ func GetSeasonAndEpisode(result APISearchResult) (season int, episode int, err e
 // GetImagePath constructs the image path for an APISearchResult
 func GetImagePath(result APISearchResult) (string, error) {
 	// Validate the episode format first
-	_, _, err := GetSeasonAndEpisode(result)
-	if err != nil {
+	if err := validateEpisodeFormat(result.Episode); err != nil {
 		return "", err
 	}
 
-	// Construct the image path using the same format as before
 	return fmt.Sprintf("/img/%s/%d/medium.jpg", result.Episode, result.Timestamp), nil
 }
 
@@ -101,6 +107,5 @@ func GetQuote(ctx context.Context, client *http.Client, config Config, quote str
 		return nil, fmt.Errorf("error decoding JSON response: %w", err)
 	}
 
-	log.Debug().Int("result_count", len(apiResults)).Str("quote", quote).Msg("retrieved quote results from frinkiac API")
 	return apiResults, nil
 }
