@@ -8,14 +8,12 @@ import (
 	"github.com/kklipsch/billy-bot/pkg/frinkiac/http"
 )
 
-
 // Command represents the CLI command for OpenRouter
 type Command struct {
 	Prompt string `arg:"" help:"The prompt to send to the AI model."`
 	Model  string `default:"openrouter/auto" help:"The model to use."`
 	APIKey string `name:"api-key" short:"k" help:"OpenRouter API key. If not provided, OPENROUTER_API_KEY env var is used."`
 }
-
 
 // Run executes the OpenRouter command
 func (o *Command) Run(ctx context.Context) error {
