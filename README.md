@@ -6,9 +6,10 @@
 
 ## The plan
 
-### Step 1 (in progress)
-
-Categorize a prompt into a Simpson's quote.
+- [x] Categorize a prompt into a Simpson's quotes in JSON format.
+- [x] Send quotes to Frinkiac and get screen caps back
+- [] Get screen cap text from Frinkiac and compare to input quote.  Big challenge is that frinkiac responds with lots of caps for the same scheme
+- [] If any screen cap texts are good matches, select its image and return.
 
 ## Development
 
