@@ -32,7 +32,7 @@ func ExampleGetQuote() {
 
 	// Print the results
 	for i, result := range results {
-		season, episode, err := GetSeasonAndEpisode(result)
+		season, episode, err := GetSeasonAndEpisode(result.EpisodID)
 		if err != nil {
 			fmt.Printf("Error parsing season/episode for result %d: %v\n", i+1, err)
 			continue
@@ -47,7 +47,7 @@ func ExampleGetQuote() {
 		fmt.Printf("Result %d:\n", i+1)
 		fmt.Printf("  Season: %d\n", season)
 		fmt.Printf("  Episode: %d\n", episode)
-		fmt.Printf("  ID: %d\n", result.Timestamp)
+		fmt.Printf("  ID: %s\n", result.Timestamp)
 		fmt.Printf("  ImagePath: %s\n", imagePath)
 	}
 }
@@ -61,7 +61,7 @@ func ExampleGetScreenCap() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := GetScreenCap(ctx, client, config, "S09", "E22", 202334)
+	result, err := GetScreenCap(ctx, client, config, "S09", "E22", Timestamp("202334"))
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -169,7 +169,7 @@ func TestParseAPIResponse(t *testing.T) {
 	require.NoError(t, err, "Failed to read test data file")
 
 	// Parse the JSON data
-	var apiResults []APISearchResult
+	var apiResults []SearchResult
 	err = json.Unmarshal(data, &apiResults)
 	require.NoError(t, err, "Failed to parse JSON data")
 
@@ -178,10 +178,10 @@ func TestParseAPIResponse(t *testing.T) {
 
 	// Verify that the first result is from season 16 episode 1
 	firstResult := apiResults[0]
-	assert.Equal(t, "S16E01", firstResult.Episode, "First result should be from S16E01")
+	assert.Equal(t, EpisodeID("S16E01"), firstResult.EpisodID, "First result should be from S16E01")
 
 	// Test GetSeasonAndEpisode function with the first result
-	season, episode, err := GetSeasonAndEpisode(firstResult)
+	season, episode, err := GetSeasonAndEpisode(firstResult.EpisodID)
 	require.NoError(t, err, "Failed to parse season and episode from first result")
 	assert.Equal(t, 16, season, "First result season should be 16")
 	assert.Equal(t, 1, episode, "First result episode should be 1")
@@ -189,24 +189,24 @@ func TestParseAPIResponse(t *testing.T) {
 	// Test GetImagePath function with the first result
 	imagePath, err := GetImagePath(firstResult)
 	require.NoError(t, err, "Failed to get image path from first result")
-	expectedPath := fmt.Sprintf("/img/S16E01/%d/medium.jpg", firstResult.Timestamp)
+	expectedPath := fmt.Sprintf("/img/S16E01/%s/medium.jpg", firstResult.Timestamp)
 	assert.Equal(t, expectedPath, imagePath, "Image path should match expected format")
 
 	// Verify that several subsequent results are from season 10 episode 19
 	s10e19Count := 0
 	for i := 1; i < 10 && i < len(apiResults); i++ {
-		if apiResults[i].Episode == "S10E19" {
+		if apiResults[i].EpisodID == "S10E19" {
 			s10e19Count++
 
 			// Test utility functions on S10E19 results
-			season, episode, err := GetSeasonAndEpisode(apiResults[i])
+			season, episode, err := GetSeasonAndEpisode(apiResults[i].EpisodID)
 			require.NoError(t, err, "Failed to parse season and episode from S10E19 result")
 			assert.Equal(t, 10, season, "S10E19 result season should be 10")
 			assert.Equal(t, 19, episode, "S10E19 result episode should be 19")
 
 			imagePath, err := GetImagePath(apiResults[i])
 			require.NoError(t, err, "Failed to get image path from S10E19 result")
-			expectedPath := fmt.Sprintf("/img/S10E19/%d/medium.jpg", apiResults[i].Timestamp)
+			expectedPath := fmt.Sprintf("/img/S10E19/%s/medium.jpg", apiResults[i].Timestamp)
 			assert.Equal(t, expectedPath, imagePath, "S10E19 image path should match expected format")
 		}
 	}
@@ -217,45 +217,45 @@ func TestParseAPIResponse(t *testing.T) {
 func TestGetSeasonAndEpisode(t *testing.T) {
 	tests := []struct {
 		name        string
-		result      APISearchResult
+		episodeID   EpisodeID
 		expectError bool
 		season      int
 		episode     int
 	}{
 		{
 			name:        "Valid S16E01",
-			result:      APISearchResult{Episode: "S16E01", Timestamp: 123456},
+			episodeID:   EpisodeID("S16E01"),
 			expectError: false,
 			season:      16,
 			episode:     1,
 		},
 		{
 			name:        "Valid S10E19",
-			result:      APISearchResult{Episode: "S10E19", Timestamp: 789012},
+			episodeID:   EpisodeID("S10E19"),
 			expectError: false,
 			season:      10,
 			episode:     19,
 		},
 		{
 			name:        "Invalid format - too short",
-			result:      APISearchResult{Episode: "S16E", Timestamp: 123456},
+			episodeID:   EpisodeID("S16E"),
 			expectError: true,
 		},
 		{
 			name:        "Invalid format - no S",
-			result:      APISearchResult{Episode: "16E01", Timestamp: 123456},
+			episodeID:   EpisodeID("16E01"),
 			expectError: true,
 		},
 		{
 			name:        "Invalid format - no E",
-			result:      APISearchResult{Episode: "S1601", Timestamp: 123456},
+			episodeID:   EpisodeID("S1601"),
 			expectError: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			season, episode, err := GetSeasonAndEpisode(tt.result)
+			season, episode, err := GetSeasonAndEpisode(tt.episodeID)
 
 			if tt.expectError {
 				assert.Error(t, err, "Expected error for invalid input")
@@ -272,19 +272,19 @@ func TestGetSeasonAndEpisode(t *testing.T) {
 func TestGetImagePath(t *testing.T) {
 	tests := []struct {
 		name        string
-		result      APISearchResult
+		result      SearchResult
 		expectError bool
 		expected    string
 	}{
 		{
 			name:        "Valid result",
-			result:      APISearchResult{Episode: "S16E01", Timestamp: 123456},
+			result:      SearchResult{EpisodID: "S16E01", Timestamp: "123456"},
 			expectError: false,
 			expected:    "/img/S16E01/123456/medium.jpg",
 		},
 		{
 			name:        "Invalid episode format",
-			result:      APISearchResult{Episode: "S16E", Timestamp: 123456},
+			result:      SearchResult{EpisodID: "S16E", Timestamp: "123456"},
 			expectError: true,
 		},
 	}

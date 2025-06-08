@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -12,54 +13,77 @@ import (
 	"golang.org/x/net/html"
 )
 
-// APISearchResult represents a single result from the Frinkiac API search endpoint
-type APISearchResult struct {
-	ID        int    `json:"Id"`
-	Episode   string `json:"Episode"` // e.g., S16E01
-	Timestamp int    `json:"Timestamp"`
+// Timestamp represents a Frinkiac timestamp as a string
+type Timestamp string
+
+// UnmarshalJSON implements json.Unmarshaler for Timestamp
+func (t *Timestamp) UnmarshalJSON(data []byte) error {
+	// Remove quotes if present (string value)
+	if len(data) > 0 && data[0] == '"' && data[len(data)-1] == '"' {
+		*t = Timestamp(data[1 : len(data)-1])
+		return nil
+	}
+	// Convert number to string
+	*t = Timestamp(string(data))
+	return nil
+}
+
+// EpisodeID represents a Simpsons episode identifier in the format S##E##
+type EpisodeID string
+
+// ErrInvalidEpisodeFormat is returned when an episode format is invalid
+var ErrInvalidEpisodeFormat = errors.New("invalid episode format")
+
+// SearchResult represents a single result from the Frinkiac API search endpoint
+type SearchResult struct {
+	ID        int       `json:"Id"`
+	EpisodID  EpisodeID `json:"Episode"` // e.g., S16E01
+	Timestamp Timestamp `json:"Timestamp"`
 }
 
 // validateEpisodeFormat checks if the episode format is valid
 // Episode format is expected to be like "S16E01"
 func validateEpisodeFormat(episode string) error {
 	if len(episode) < 6 {
-		return fmt.Errorf("invalid episode format: %s", episode)
+		return fmt.Errorf("%w: %s", ErrInvalidEpisodeFormat, episode)
 	}
 	return nil
 }
 
-// GetSeasonAndEpisode extracts season and episode numbers from an APISearchResult
+// GetSeasonAndEpisode extracts season and episode numbers from an EpisodeID
 // Episode format is expected to be like "S16E01"
-func GetSeasonAndEpisode(result APISearchResult) (season int, episode int, err error) {
-	if err := validateEpisodeFormat(result.Episode); err != nil {
+func GetSeasonAndEpisode(episodeID EpisodeID) (season int, episode int, err error) {
+	episodeStr := string(episodeID)
+	if err := validateEpisodeFormat(episodeStr); err != nil {
 		return 0, 0, err
 	}
 
 	// Extract season number from "S16" part
-	seasonStr := result.Episode[1:3] // Skip 'S', get "16"
+	seasonStr := episodeStr[1:3] // Skip 'S', get "16"
 	season, err = strconv.Atoi(seasonStr)
 	if err != nil {
-		return 0, 0, fmt.Errorf("invalid season number in episode %s: %w", result.Episode, err)
+		return 0, 0, fmt.Errorf("%w: invalid season number in episode %s: %w", ErrInvalidEpisodeFormat, episodeStr, err)
 	}
 
 	// Extract episode number from "E01" part
-	episodeStr := result.Episode[4:6] // Skip "S16E", get "01"
-	episode, err = strconv.Atoi(episodeStr)
+	episodeNumStr := episodeStr[4:6] // Skip "S16E", get "01"
+	episode, err = strconv.Atoi(episodeNumStr)
 	if err != nil {
-		return 0, 0, fmt.Errorf("invalid episode number in episode %s: %w", result.Episode, err)
+		return 0, 0, fmt.Errorf("%w: invalid episode number in episode %s: %w", ErrInvalidEpisodeFormat, episodeStr, err)
 	}
 
 	return season, episode, nil
 }
 
-// GetImagePath constructs the image path for an APISearchResult
-func GetImagePath(result APISearchResult) (string, error) {
+// GetImagePath constructs the image path for a SearchResult
+func GetImagePath(result SearchResult) (string, error) {
 	// Validate the episode format first
-	if err := validateEpisodeFormat(result.Episode); err != nil {
+	episodeStr := string(result.EpisodID)
+	if err := validateEpisodeFormat(episodeStr); err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("/img/%s/%d/medium.jpg", result.Episode, result.Timestamp), nil
+	return fmt.Sprintf("/img/%s/%s/medium.jpg", result.EpisodID, result.Timestamp), nil
 }
 
 // hasClass checks if a node has a specific class
@@ -79,7 +103,7 @@ func hasClass(n *html.Node, class string) bool {
 }
 
 // GetQuote searches for a quote on Frinkiac and returns the results
-func GetQuote(ctx context.Context, client *http.Client, config Config, quote string) ([]APISearchResult, error) {
+func GetQuote(ctx context.Context, client *http.Client, config Config, quote string) ([]SearchResult, error) {
 	// Set up query parameters
 	queryParams := url.Values{}
 	queryParams.Set("q", quote)
@@ -102,7 +126,7 @@ func GetQuote(ctx context.Context, client *http.Client, config Config, quote str
 	defer resp.Body.Close()
 
 	// Parse JSON response
-	var apiResults []APISearchResult
+	var apiResults []SearchResult
 	if err := json.NewDecoder(resp.Body).Decode(&apiResults); err != nil {
 		return nil, fmt.Errorf("error decoding JSON response: %w", err)
 	}

@@ -48,8 +48,7 @@ func (o *Command) Run(ctx context.Context) error {
 			// Use the first result
 			result := results[0]
 
-			// Extract season and episode using the new utility function
-			season, episode, err := http.GetSeasonAndEpisode(result)
+			season, episode, err := http.GetSeasonAndEpisode(result.EpisodID)
 			if err != nil {
 				fmt.Printf("   Error parsing season/episode: %v\n", err)
 				continue
@@ -58,7 +57,7 @@ func (o *Command) Run(ctx context.Context) error {
 			seasonStr := fmt.Sprintf("S%02d", season)
 			episodeStr := fmt.Sprintf("E%02d", episode)
 
-			fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %d\n", seasonStr, episodeStr, result.Timestamp)
+			fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", seasonStr, episodeStr, result.Timestamp)
 
 			// Get the screen cap
 			screenCap, err := http.GetScreenCap(ctx, client, config, seasonStr, episodeStr, result.Timestamp)
