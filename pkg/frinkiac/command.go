@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kklipsch/billy-bot/pkg/config"
+	"github.com/kklipsch/billy-bot/pkg/frinkiac/ai"
 	"github.com/kklipsch/billy-bot/pkg/frinkiac/http"
 )
 
@@ -22,7 +23,7 @@ func (o *Command) Run(ctx context.Context) error {
 		return err
 	}
 
-	quotes, err := GetCandidateQuotes(ctx, o.Prompt, apiKey)
+	quotes, err := ai.GetCandidateQuotes(ctx, o.Prompt, apiKey)
 	if err != nil {
 		return err
 	}
