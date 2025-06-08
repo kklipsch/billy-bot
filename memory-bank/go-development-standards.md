@@ -172,6 +172,42 @@ Follow Go's explicit error handling patterns:
 - Avoid circular dependencies
 - Export only what needs to be public
 
+## Git Workflow and File Management
+
+### Prefer Git Moves for Better History
+
+When refactoring code that involves moving functionality between files or packages, prefer using `git mv` to preserve git history and make the changes easier to track.
+
+#### When Moving Files
+```bash
+# ✅ Preferred: Use git mv to preserve history
+git mv old/path/file.go new/path/file.go
+# Then edit the file to update package declaration and imports
+```
+
+#### When Moving Functions Between Files
+If moving functions between existing files:
+
+1. **First**: Use `git mv` to create the new file structure if needed
+2. **Then**: Move the functions using normal edit operations
+3. **Document**: In commit messages, clearly describe what was moved where
+
+#### Benefits of Git Moves
+- **Preserves file history**: `git log --follow` can track the file across moves
+- **Better diffs**: Git can better understand what changed vs. what moved
+- **Easier reviews**: Reviewers can see the relationship between old and new locations
+- **Cleaner history**: Shows intent to move rather than delete/create
+
+#### Example Workflow
+```bash
+# Moving a package from old location to new location
+git mv pkg/old/client.go pkg/new/client.go
+# Edit the file to update package declaration
+# Update imports in files that reference it
+git add -A
+git commit -m "refactor: move client from pkg/old to pkg/new"
+```
+
 ## Code Style
 
 - Use `gofmt` for formatting
