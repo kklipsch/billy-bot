@@ -2,7 +2,16 @@
 
 ## Current Work Focus
 
-The current focus of the Billy Bot project is on implementing Step 1 as outlined in the README: **Categorizing a prompt into a Simpson's quote**. This is the foundational capability that will enable the bot to match user inputs with appropriate Simpsons references, with the primary goal of integrating with GitHub for issues, tasks, and pull requests.
+The current focus of the Billy Bot project includes two parallel efforts:
+
+1. **Core Functionality**: Implementing Step 1 as outlined in the README: **Categorizing a prompt into a Simpson's quote**. This is the foundational capability that will enable the bot to match user inputs with appropriate Simpsons references.
+
+2. **GitHub Actions Workflow Enhancement** (Issue #11): Improving the Claude GitHub action workflow to include:
+   - Automated code quality checks (gofmt, golint) before commits
+   - Automatic PR creation capabilities
+   - Enhanced memory bank file updates with context and changes
+
+Both efforts support the primary goal of integrating with GitHub for issues, tasks, and pull requests.
 
 Key aspects of this work include:
 - Developing the core logic for analyzing prompts
@@ -22,10 +31,12 @@ As the project is in its initial development phase, the recent changes include:
 - Implementing context-based cancellation for graceful shutdown
 - Adding environment variable loading with godotenv
 - Adding GitHub Action for code quality checks (gofmt, golint, and tests)
+- Implementing Claude GitHub action for handling @claude mentions in issues and PRs
 - Fixing all golint issues in the codebase:
   - Adding proper documentation comments to all exported types and functions in the OpenRouter package
   - Fixing a stuttering function name (renamed OpenRouterCall to Call)
   - Updating references to the renamed function
+- Working on Issue #11: GitHub Actions workflow enhancements to improve automation and workflow integration
 
 ## Next Steps
 
