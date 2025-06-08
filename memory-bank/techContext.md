@@ -109,6 +109,11 @@ Available commands:
   - `frinkiac`: Functionality for interacting with the Frinkiac API
   - `smee`: Functionality for the Smee client
 
+### Development Standards
+- **Go Development Standards**: See [go-development-standards.md](./go-development-standards.md) for detailed coding standards and patterns
+- **Functional Style Preferred**: The project uses functional programming patterns over object-oriented approaches for API clients and business logic
+- **Explicit Dependencies**: Functions take dependencies as parameters rather than embedding them in structs
+
 ### Testing Strategy
 - **Unit Tests**: For testing individual components in isolation
 - **Integration Tests**: For testing interactions between components

@@ -16,42 +16,22 @@ const (
 	BaseURL = "https://frinkiac.com"
 )
 
-// Client represents a client for interacting with the Frinkiac website
-type Client struct {
-	httpClient *http.Client
-	baseURL    string
+// Config holds configuration for making Frinkiac HTTP requests
+type Config struct {
+	BaseURL string
 }
 
-// New creates a new Frinkiac client
-func New(opts ...Option) *Client {
-	c := &Client{
-		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
-		baseURL: BaseURL,
-	}
-
-	for _, opt := range opts {
-		opt(c)
-	}
-
-	return c
-}
-
-// Option is a function that configures a Client
-type Option func(*Client)
-
-// WithHTTPClient sets the HTTP client to use
-func WithHTTPClient(httpClient *http.Client) Option {
-	return func(c *Client) {
-		c.httpClient = httpClient
+// DefaultConfig returns a default configuration for Frinkiac requests
+func DefaultConfig() Config {
+	return Config{
+		BaseURL: BaseURL,
 	}
 }
 
-// WithBaseURL sets the base URL to use
-func WithBaseURL(baseURL string) Option {
-	return func(c *Client) {
-		c.baseURL = baseURL
+// NewHTTPClient creates a new HTTP client with appropriate timeout for Frinkiac
+func NewHTTPClient() *http.Client {
+	return &http.Client{
+		Timeout: 10 * time.Second,
 	}
 }
 
@@ -64,9 +44,9 @@ type RequestOptions struct {
 }
 
 // doRequest makes an HTTP request and returns the response body
-func (c *Client) doRequest(ctx context.Context, opts RequestOptions) (*http.Response, error) {
+func doRequest(ctx context.Context, client *http.Client, config Config, opts RequestOptions) (*http.Response, error) {
 	// Construct URL
-	u, err := url.Parse(fmt.Sprintf("%s%s", c.baseURL, opts.Path))
+	u, err := url.Parse(fmt.Sprintf("%s%s", config.BaseURL, opts.Path))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing URL: %w", err)
 	}
@@ -102,7 +82,7 @@ func (c *Client) doRequest(ctx context.Context, opts RequestOptions) (*http.Resp
 	}
 
 	// Send request
-	resp, err := c.httpClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}

@@ -55,19 +55,19 @@ type APICaption struct {
 }
 
 // GetScreenCap gets a screen cap from Frinkiac
-func (c *Client) GetScreenCap(ctx context.Context, season, episode, id string) (*ScreenCapResult, error) {
+func GetScreenCap(ctx context.Context, client *http.Client, config Config, season, episode, id string) (*ScreenCapResult, error) {
 	// First try the JSON API endpoint
-	result, err := c.getScreenCapFromAPI(ctx, season, episode, id)
+	result, err := getScreenCapFromAPI(ctx, client, config, season, episode, id)
 	if err != nil {
 		// If the API endpoint fails, fall back to the HTML endpoint
 		log.Info().Str("season", season).Str("episode", episode).Str("id", id).Msg("API endpoint failed, falling back to HTML endpoint")
-		return c.getScreenCapFromHTML(ctx, season, episode, id)
+		return getScreenCapFromHTML(ctx, client, config, season, episode, id)
 	}
 	return result, nil
 }
 
 // getScreenCapFromAPI gets a screen cap from Frinkiac using the JSON API
-func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id string) (*ScreenCapResult, error) {
+func getScreenCapFromAPI(ctx context.Context, client *http.Client, config Config, season, episode, id string) (*ScreenCapResult, error) {
 	// Combine season and episode for the 'e' parameter (e.g., S16E01)
 	episodeKey := fmt.Sprintf("%s%s", season, episode)
 
@@ -84,7 +84,7 @@ func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id st
 	}
 
 	// Make the request
-	resp, err := c.doRequest(ctx, RequestOptions{
+	resp, err := doRequest(ctx, client, config, RequestOptions{
 		Method:      http.MethodGet,
 		Path:        "/api/caption",
 		QueryParams: queryParams,
@@ -127,7 +127,7 @@ func (c *Client) getScreenCapFromAPI(ctx context.Context, season, episode, id st
 }
 
 // getScreenCapFromHTML gets a screen cap from Frinkiac using the HTML endpoint
-func (c *Client) getScreenCapFromHTML(ctx context.Context, season, episode, id string) (*ScreenCapResult, error) {
+func getScreenCapFromHTML(ctx context.Context, client *http.Client, config Config, season, episode, id string) (*ScreenCapResult, error) {
 	// Set up log context
 	logContext := map[string]interface{}{
 		"season":  season,
@@ -138,7 +138,7 @@ func (c *Client) getScreenCapFromHTML(ctx context.Context, season, episode, id s
 
 	// Make the request
 	path := fmt.Sprintf("/caption/%s%s/%s", season, episode, id)
-	resp, err := c.doRequest(ctx, RequestOptions{
+	resp, err := doRequest(ctx, client, config, RequestOptions{
 		Method:     http.MethodGet,
 		Path:       path,
 		LogContext: logContext,

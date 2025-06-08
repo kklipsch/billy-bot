@@ -44,7 +44,7 @@ func hasClass(n *html.Node, class string) bool {
 }
 
 // GetQuote searches for a quote on Frinkiac and returns the results
-func (c *Client) GetQuote(ctx context.Context, quote string) ([]QuoteResult, error) {
+func GetQuote(ctx context.Context, client *http.Client, config Config, quote string) ([]QuoteResult, error) {
 	// Set up query parameters
 	queryParams := url.Values{}
 	queryParams.Set("q", quote)
@@ -55,7 +55,7 @@ func (c *Client) GetQuote(ctx context.Context, quote string) ([]QuoteResult, err
 	}
 
 	// Make the request
-	resp, err := c.doRequest(ctx, RequestOptions{
+	resp, err := doRequest(ctx, client, config, RequestOptions{
 		Method:      http.MethodGet,
 		Path:        "/api/search",
 		QueryParams: queryParams,
