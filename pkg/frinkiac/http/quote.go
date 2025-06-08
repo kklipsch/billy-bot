@@ -6,25 +6,54 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/html"
 )
 
-// QuoteResult represents a single result from a quote search
-type QuoteResult struct {
-	ImagePath string // e.g., /img/S09E22/202334/medium.jpg
-	Season    string // e.g., S09
-	Episode   string // e.g., E22
-	ID        string // e.g., 202334
-}
-
 // APISearchResult represents a single result from the Frinkiac API search endpoint
 type APISearchResult struct {
 	ID        int    `json:"Id"`
 	Episode   string `json:"Episode"` // e.g., S16E01
 	Timestamp int    `json:"Timestamp"`
+}
+
+// GetSeasonAndEpisode extracts season and episode numbers from an APISearchResult
+// Episode format is expected to be like "S16E01"
+func GetSeasonAndEpisode(result APISearchResult) (season int, episode int, err error) {
+	if len(result.Episode) < 6 {
+		return 0, 0, fmt.Errorf("invalid episode format: %s", result.Episode)
+	}
+
+	// Extract season number from "S16" part
+	seasonStr := result.Episode[1:3] // Skip 'S', get "16"
+	season, err = strconv.Atoi(seasonStr)
+	if err != nil {
+		return 0, 0, fmt.Errorf("invalid season number in episode %s: %w", result.Episode, err)
+	}
+
+	// Extract episode number from "E01" part
+	episodeStr := result.Episode[4:6] // Skip "S16E", get "01"
+	episode, err = strconv.Atoi(episodeStr)
+	if err != nil {
+		return 0, 0, fmt.Errorf("invalid episode number in episode %s: %w", result.Episode, err)
+	}
+
+	return season, episode, nil
+}
+
+// GetImagePath constructs the image path for an APISearchResult
+func GetImagePath(result APISearchResult) (string, error) {
+	// Validate the episode format first
+	_, _, err := GetSeasonAndEpisode(result)
+	if err != nil {
+		return "", err
+	}
+
+	// Construct the image path using the same format as before
+	return fmt.Sprintf("/img/%s/%d/medium.jpg", result.Episode, result.Timestamp), nil
 }
 
 // hasClass checks if a node has a specific class
@@ -44,7 +73,7 @@ func hasClass(n *html.Node, class string) bool {
 }
 
 // GetQuote searches for a quote on Frinkiac and returns the results
-func GetQuote(ctx context.Context, client *http.Client, config Config, quote string) ([]QuoteResult, error) {
+func GetQuote(ctx context.Context, client *http.Client, config Config, quote string) ([]APISearchResult, error) {
 	// Set up query parameters
 	queryParams := url.Values{}
 	queryParams.Set("q", quote)
@@ -72,30 +101,6 @@ func GetQuote(ctx context.Context, client *http.Client, config Config, quote str
 		return nil, fmt.Errorf("error decoding JSON response: %w", err)
 	}
 
-	// Convert API results to QuoteResult objects
-	results := make([]QuoteResult, 0, len(apiResults))
-	for _, apiResult := range apiResults {
-		// Extract season and episode from the format S16E01
-		if len(apiResult.Episode) < 6 {
-			log.Debug().Str("episode", apiResult.Episode).Msg("invalid episode format")
-			continue
-		}
-
-		season := apiResult.Episode[:3]  // S16
-		episode := apiResult.Episode[3:] // E01
-		id := fmt.Sprintf("%d", apiResult.Timestamp)
-
-		// Construct the image path
-		imagePath := fmt.Sprintf("/img/%s/%s/medium.jpg", apiResult.Episode, id)
-
-		results = append(results, QuoteResult{
-			ImagePath: imagePath,
-			Season:    season,
-			Episode:   episode,
-			ID:        id,
-		})
-	}
-
-	log.Debug().Int("result_count", len(results)).Str("quote", quote).Msg("parsed quote results from frinkiac API")
-	return results, nil
+	log.Debug().Int("result_count", len(apiResults)).Str("quote", quote).Msg("retrieved quote results from frinkiac API")
+	return apiResults, nil
 }
