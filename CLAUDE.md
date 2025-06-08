@@ -66,6 +66,39 @@ golint ./...
 - Test data in `/pkg/frinkiac/http/testdata/`
 - Integration tests with real API responses
 
+## Memory Bank Maintenance
+
+The `memory-bank/` directory contains critical project context files that **must be kept up-to-date** when making changes to the codebase. These files serve as persistent knowledge for Claude Code and future development work.
+
+### Memory Bank Files
+
+- **activeContext.md**: Current work focus, recent changes, and immediate next steps
+- **progress.md**: What works, what's left to build, current status, and known issues  
+- **productContext.md**: Product vision, user stories, and feature requirements
+- **projectbrief.md**: High-level project overview and goals
+- **systemPatterns.md**: Architectural patterns, design decisions, and technical conventions
+- **techContext.md**: Technical implementation details, frameworks, and dependencies
+
+### Update Requirements
+
+**When making changes, always update relevant memory-bank files:**
+
+1. **After adding new features**: Update `progress.md` (move items from "What's Left" to "What Works")
+2. **When changing architecture**: Update `systemPatterns.md` and `techContext.md`
+3. **For new decisions/learnings**: Update `activeContext.md` with insights and approach changes
+4. **When shifting focus**: Update `activeContext.md` "Current Work Focus" section
+5. **For bugs/issues discovered**: Update `progress.md` "Known Issues" section
+
+### Reading Context
+
+**Before starting work, always read memory-bank files to understand:**
+- Current project state and priorities (`activeContext.md`)
+- What's already working vs. what needs building (`progress.md`)
+- Established patterns and conventions (`systemPatterns.md`)
+- Technical context and dependencies (`techContext.md`)
+
+This ensures continuity across development sessions and maintains project knowledge.
+
 ## Environment Setup
 
 The project uses a dev container configuration. Required environment variable:
