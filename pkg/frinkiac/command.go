@@ -27,8 +27,9 @@ func (o *Command) Run(ctx context.Context) error {
 		return err
 	}
 
-	// Create a Frinkiac client
-	frinkiacClient := http.New()
+	// Create a Frinkiac HTTP client and config
+	client := http.NewHTTPClient()
+	config := http.DefaultConfig()
 
 	// Process each quote
 	fmt.Println("Quotes found:")
@@ -43,7 +44,7 @@ func (o *Command) Run(ctx context.Context) error {
 			fmt.Printf("   Season %s, Episode %s provided by AI\n", season, episode)
 
 			// We don't have the ID, so we need to search for the quote first
-			results, err := frinkiacClient.GetQuote(ctx, quote.Quote)
+			results, err := http.GetQuote(ctx, client, config, quote.Quote)
 			if err != nil {
 				fmt.Printf("   Error searching for quote: %v\n", err)
 				continue
@@ -55,7 +56,7 @@ func (o *Command) Run(ctx context.Context) error {
 				fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", result.Season, result.Episode, result.ID)
 
 				// Get the screen cap
-				screenCap, err := frinkiacClient.GetScreenCap(ctx, result.Season, result.Episode, result.ID)
+				screenCap, err := http.GetScreenCap(ctx, client, config, result.Season, result.Episode, result.ID)
 				if err != nil {
 					fmt.Printf("   Error getting screen cap: %v\n", err)
 					continue
@@ -68,7 +69,7 @@ func (o *Command) Run(ctx context.Context) error {
 			}
 		} else {
 			// Search for the quote
-			results, err := frinkiacClient.GetQuote(ctx, quote.Quote)
+			results, err := http.GetQuote(ctx, client, config, quote.Quote)
 			if err != nil {
 				fmt.Printf("   Error searching for quote: %v\n", err)
 				continue
@@ -80,7 +81,7 @@ func (o *Command) Run(ctx context.Context) error {
 				fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", result.Season, result.Episode, result.ID)
 
 				// Get the screen cap
-				screenCap, err := frinkiacClient.GetScreenCap(ctx, result.Season, result.Episode, result.ID)
+				screenCap, err := http.GetScreenCap(ctx, client, config, result.Season, result.Episode, result.ID)
 				if err != nil {
 					fmt.Printf("   Error getting screen cap: %v\n", err)
 					continue
