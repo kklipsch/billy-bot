@@ -99,6 +99,28 @@ The `memory-bank/` directory contains critical project context files that **must
 
 This ensures continuity across development sessions and maintains project knowledge.
 
+## Claude Code Workflow Integration
+
+When working via Claude Code action (GitHub workflows), Claude should automatically create pull requests when it has the necessary permissions and tools, rather than providing manual PR creation instructions.
+
+### Auto-PR Creation Requirements
+
+Claude should create PRs automatically when:
+- Workflow has `pull-requests: write` permission
+- `Bash` tool is available in `allowed_tools`
+- Changes have been made to the codebase
+
+### Auto-PR Workflow
+
+When conditions are met, Claude should:
+1. Create a new branch: `claude/issue-<number>-<timestamp>`
+2. Commit changes with proper attribution
+3. Push branch to remote
+4. Create PR using: `gh pr create --title "<title>" --body "<description>"`
+5. Update GitHub comment with PR link
+
+**Important**: Do not provide manual PR creation instructions when auto-creation is possible.
+
 ## Environment Setup
 
 The project uses a dev container configuration. Required environment variable:
