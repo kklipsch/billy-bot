@@ -24,6 +24,11 @@ As the project is in its initial development phase, the following components are
    - JSON parsing for extracting screen captures information
    - Unit tests with saved API responses using testify for clearer assertions
 
+4. **GitHub Actions Workflow**:
+   - Claude PR assistant action responding to @claude mentions
+   - Automated code quality checks (gofmt, golint, tests) on push/PR
+   - Integration between Claude Code and repository workflows
+
 ## What's Left to Build
 
 The following components and features are still pending implementation:
