@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/kklipsch/billy-bot/pkg/config"
-	"github.com/kklipsch/billy-bot/pkg/frinkiac/client"
+	frinkiachttp "github.com/kklipsch/billy-bot/pkg/frinkiac/http"
 	"github.com/kklipsch/billy-bot/pkg/jsonschema"
 	openrouter "github.com/kklipsch/billy-bot/pkg/openrouter"
 )
@@ -103,7 +103,7 @@ func (o *Command) Run(ctx context.Context) error {
 	}
 
 	// Create a Frinkiac client
-	frinkiacClient := client.New()
+	frinkiacClient := frinkiachttp.New()
 
 	// Process each quote
 	fmt.Println("Quotes found:")
@@ -137,7 +137,7 @@ func (o *Command) Run(ctx context.Context) error {
 				}
 
 				fmt.Printf("   Caption: %s\n", screenCap.Caption)
-				fmt.Printf("   Image URL: %s%s\n", client.BaseURL, screenCap.ImagePath)
+				fmt.Printf("   Image URL: %s%s\n", frinkiachttp.BaseURL, screenCap.ImagePath)
 			} else {
 				fmt.Println("   No screen caps found for this quote")
 			}
@@ -162,7 +162,7 @@ func (o *Command) Run(ctx context.Context) error {
 				}
 
 				fmt.Printf("   Caption: %s\n", screenCap.Caption)
-				fmt.Printf("   Image URL: %s%s\n", client.BaseURL, screenCap.ImagePath)
+				fmt.Printf("   Image URL: %s%s\n", frinkiachttp.BaseURL, screenCap.ImagePath)
 			} else {
 				fmt.Println("   No screen caps found for this quote")
 			}
