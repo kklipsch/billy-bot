@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Billy Bot is a Go CLI application that categorizes prompts into relevant Simpsons quotes and retrieves corresponding screen captures from Frinkiac. It replaces Billy's skill of selecting appropriate Simpsons references for any occasion.
 
+## MANDATORY: Pull Request Creation
+
+For ANY code changes, Claude MUST create a pull request as the final step. This is non-negotiable when permissions and tools allow it.
+
 ## Development Commands
 
 ```bash
@@ -22,6 +26,11 @@ go test ./pkg/frinkiac/http/               # Run specific package tests
 gofmt -s -w .                              # Format code
 golint ./...                               # Lint code
 ```
+
+The following steps must be completed for ANY task involving code changes:
+1. Run quality checks: `go test ./...`, `gofmt -s -w .`, `golint ./...`
+2. Create pull request automatically (when permissions allow)
+3. Update memory-bank files as needed
 
 The following commands must be run and have a successful result, prior to any commit:
 ```
@@ -105,19 +114,30 @@ When working via Claude Code action (GitHub workflows), Claude should automatica
 
 ### Auto-PR Creation Requirements
 
-Claude should create PRs automatically when:
+Claude MUST create PRs automatically when:
 - Workflow has `pull-requests: write` permission
 - `Bash` tool is available in `allowed_tools`
 - Changes have been made to the codebase
 
 ### Auto-PR Workflow
 
-When conditions are met, Claude should:
+Before completing any task that involves code changes, Claude must:
+1. Verify it has 'pull-requests: write' permission
+2. Confirm 'Bash' tool is available in allowed_tools  
+3. Check if any files were modified/created
+4. If all conditions are met, immediately proceed with PR creation
+5. If conditions are not met, explicitly state why PR creation was skipped
+
+When conditions are met, Claude MUST:
 1. Create a new branch: `claude/issue-<number>-<timestamp>`
 2. Commit changes with proper attribution
 3. Push branch to remote
 4. Create PR using: `gh pr create --title "<title>" --body "<description>"`
 5. Update GitHub comment with PR link
+
+**CRITICAL**: For any task that modifies code, the final step is ALWAYS to create a pull request. Never consider a task "complete" without either:
+- Creating a PR automatically, OR  
+- Explicitly explaining why PR creation was not possible
 
 **Important**: Do not provide manual PR creation instructions when auto-creation is possible.
 
