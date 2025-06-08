@@ -23,6 +23,13 @@ gofmt -s -w .                              # Format code
 golint ./...                               # Lint code
 ```
 
+The following commands must be run and have a successful result, prior to any commit:
+```
+go test ./...
+gofmt -s -w .
+golint ./...
+```
+
 ## Architecture
 
 ### Core Components
