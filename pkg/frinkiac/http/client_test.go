@@ -15,15 +15,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func ExampleClient_GetQuote() {
-	// Create a new client
-	client := New()
+func ExampleGetQuote() {
+	// Create a new client and config
+	client := NewHTTPClient()
+	config := DefaultConfig()
 
 	// Search for a quote
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	results, err := client.GetQuote(ctx, "garbage water")
+	results, err := GetQuote(ctx, client, config, "garbage water")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -39,15 +40,16 @@ func ExampleClient_GetQuote() {
 	}
 }
 
-func ExampleClient_GetScreenCap() {
-	// Create a new client
-	client := New()
+func ExampleGetScreenCap() {
+	// Create a new client and config
+	client := NewHTTPClient()
+	config := DefaultConfig()
 
 	// Get a screen cap
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := client.GetScreenCap(ctx, "S09", "E22", "202334")
+	result, err := GetScreenCap(ctx, client, config, "S09", "E22", "202334")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -61,14 +63,17 @@ func ExampleClient_GetScreenCap() {
 	fmt.Printf("Caption: %s\n", result.Caption)
 }
 
-func TestClient(t *testing.T) {
+func TestHTTPClient(t *testing.T) {
 	// This is just a placeholder test to ensure the package compiles
 	// Real tests would make HTTP requests to the Frinkiac website or use mocks
-	client := New()
+	client := NewHTTPClient()
 	require.NotNil(t, client, "Failed to create client")
+
+	config := DefaultConfig()
+	require.NotEmpty(t, config.BaseURL, "Config should have a base URL")
 }
 
-// TestDoRequest tests the doRequest method with a mock HTTP client
+// TestDoRequest tests the doRequest function with a mock HTTP client
 func TestDoRequest(t *testing.T) {
 	// Create a mock HTTP client that returns a predefined response
 	mockClient := &http.Client{
@@ -80,12 +85,12 @@ func TestDoRequest(t *testing.T) {
 		},
 	}
 
-	// Create a client with the mock HTTP client
-	client := New(WithHTTPClient(mockClient))
+	// Create a config
+	config := DefaultConfig()
 
 	// Make a request
 	ctx := context.Background()
-	resp, err := client.doRequest(ctx, RequestOptions{
+	resp, err := doRequest(ctx, mockClient, config, RequestOptions{
 		Method: http.MethodGet,
 		Path:   "/test",
 		LogContext: map[string]interface{}{
@@ -107,7 +112,7 @@ func TestDoRequest(t *testing.T) {
 	assert.Equal(t, `{"test": "data"}`, string(body), "Response body should match expected value")
 }
 
-// TestDoRequestError tests the doRequest method with an error response
+// TestDoRequestError tests the doRequest function with an error response
 func TestDoRequestError(t *testing.T) {
 	// Create a mock HTTP client that returns an error response
 	mockClient := &http.Client{
@@ -119,12 +124,12 @@ func TestDoRequestError(t *testing.T) {
 		},
 	}
 
-	// Create a client with the mock HTTP client
-	client := New(WithHTTPClient(mockClient))
+	// Create a config
+	config := DefaultConfig()
 
 	// Make a request
 	ctx := context.Background()
-	_, err := client.doRequest(ctx, RequestOptions{
+	_, err := doRequest(ctx, mockClient, config, RequestOptions{
 		Method: http.MethodGet,
 		Path:   "/test",
 	})
