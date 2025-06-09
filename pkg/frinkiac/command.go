@@ -60,7 +60,7 @@ func (o *Command) Run(ctx context.Context) error {
 			fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", seasonStr, episodeStr, result.Timestamp)
 
 			// Get the screen cap
-			screenCap, err := http.GetScreenCap(ctx, client, config, seasonStr, episodeStr, result.Timestamp)
+			screenCap, err := http.GetScreenCap(ctx, client, config, season, episode, result.Timestamp)
 			if err != nil {
 				fmt.Printf("   Error getting screen cap: %v\n", err)
 				continue

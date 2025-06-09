@@ -75,15 +75,15 @@ func GetSeasonAndEpisode(episodeID EpisodeID) (season int, episode int, err erro
 	return season, episode, nil
 }
 
-// GetImagePath constructs the image path for a SearchResult
-func GetImagePath(result SearchResult) (string, error) {
+// GetImagePath constructs the image path for the given episodeID and timestamp
+func GetImagePath(episodeID EpisodeID, timestamp Timestamp) (string, error) {
 	// Validate the episode format first
-	episodeStr := string(result.EpisodID)
+	episodeStr := string(episodeID)
 	if err := validateEpisodeFormat(episodeStr); err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("/img/%s/%s/medium.jpg", result.EpisodID, result.Timestamp), nil
+	return fmt.Sprintf("/img/%s/%s/medium.jpg", episodeID, timestamp), nil
 }
 
 // hasClass checks if a node has a specific class

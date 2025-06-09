@@ -38,7 +38,7 @@ func ExampleGetQuote() {
 			continue
 		}
 
-		imagePath, err := GetImagePath(result)
+		imagePath, err := GetImagePath(result.EpisodID, result.Timestamp)
 		if err != nil {
 			fmt.Printf("Error getting image path for result %d: %v\n", i+1, err)
 			continue
@@ -61,7 +61,7 @@ func ExampleGetScreenCap() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := GetScreenCap(ctx, client, config, "S09", "E22", Timestamp("202334"))
+	result, err := GetScreenCap(ctx, client, config, 9, 22, Timestamp("202334"))
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -187,7 +187,7 @@ func TestParseAPIResponse(t *testing.T) {
 	assert.Equal(t, 1, episode, "First result episode should be 1")
 
 	// Test GetImagePath function with the first result
-	imagePath, err := GetImagePath(firstResult)
+	imagePath, err := GetImagePath(firstResult.EpisodID, firstResult.Timestamp)
 	require.NoError(t, err, "Failed to get image path from first result")
 	expectedPath := fmt.Sprintf("/img/S16E01/%s/medium.jpg", firstResult.Timestamp)
 	assert.Equal(t, expectedPath, imagePath, "Image path should match expected format")
@@ -204,7 +204,7 @@ func TestParseAPIResponse(t *testing.T) {
 			assert.Equal(t, 10, season, "S10E19 result season should be 10")
 			assert.Equal(t, 19, episode, "S10E19 result episode should be 19")
 
-			imagePath, err := GetImagePath(apiResults[i])
+			imagePath, err := GetImagePath(apiResults[i].EpisodID, apiResults[i].Timestamp)
 			require.NoError(t, err, "Failed to get image path from S10E19 result")
 			expectedPath := fmt.Sprintf("/img/S10E19/%s/medium.jpg", apiResults[i].Timestamp)
 			assert.Equal(t, expectedPath, imagePath, "S10E19 image path should match expected format")
@@ -272,26 +272,29 @@ func TestGetSeasonAndEpisode(t *testing.T) {
 func TestGetImagePath(t *testing.T) {
 	tests := []struct {
 		name        string
-		result      SearchResult
+		episodeID   EpisodeID
+		timestamp   Timestamp
 		expectError bool
 		expected    string
 	}{
 		{
 			name:        "Valid result",
-			result:      SearchResult{EpisodID: "S16E01", Timestamp: "123456"},
+			episodeID:   "S16E01",
+			timestamp:   "123456",
 			expectError: false,
 			expected:    "/img/S16E01/123456/medium.jpg",
 		},
 		{
 			name:        "Invalid episode format",
-			result:      SearchResult{EpisodID: "S16E", Timestamp: "123456"},
+			episodeID:   "S16E",
+			timestamp:   "123456",
 			expectError: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			imagePath, err := GetImagePath(tt.result)
+			imagePath, err := GetImagePath(tt.episodeID, tt.timestamp)
 
 			if tt.expectError {
 				assert.Error(t, err, "Expected error for invalid input")

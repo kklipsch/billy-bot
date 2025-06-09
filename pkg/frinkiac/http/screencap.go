@@ -55,16 +55,20 @@ type APICaption struct {
 }
 
 // GetScreenCap gets a screen cap from Frinkiac
-func GetScreenCap(ctx context.Context, client *http.Client, config Config, season, episode string, timestamp Timestamp) (*ScreenCapResult, error) {
+func GetScreenCap(ctx context.Context, client *http.Client, config Config, season, episode int, timestamp Timestamp) (*ScreenCapResult, error) {
 	// Convert timestamp to string for internal functions
 	id := string(timestamp)
 
+	// Convert season and episode to strings for internal functions
+	seasonStr := fmt.Sprintf("S%02d", season)
+	episodeStr := fmt.Sprintf("E%02d", episode)
+
 	// First try the JSON API endpoint
-	result, err := getScreenCapFromAPI(ctx, client, config, season, episode, id)
+	result, err := getScreenCapFromAPI(ctx, client, config, seasonStr, episodeStr, id)
 	if err != nil {
 		// If the API endpoint fails, fall back to the HTML endpoint
-		log.Info().Str("season", season).Str("episode", episode).Str("id", id).Msg("API endpoint failed, falling back to HTML endpoint")
-		return getScreenCapFromHTML(ctx, client, config, season, episode, id)
+		log.Info().Str("season", seasonStr).Str("episode", episodeStr).Str("id", id).Msg("API endpoint failed, falling back to HTML endpoint")
+		return getScreenCapFromHTML(ctx, client, config, seasonStr, episodeStr, id)
 	}
 	return result, nil
 }
