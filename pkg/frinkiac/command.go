@@ -47,10 +47,20 @@ func (o *Command) Run(ctx context.Context) error {
 		if len(results) > 0 {
 			// Use the first result
 			result := results[0]
-			fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", result.Season, result.Episode, result.ID)
+
+			season, episode, err := http.GetSeasonAndEpisode(result.EpisodID)
+			if err != nil {
+				fmt.Printf("   Error parsing season/episode: %v\n", err)
+				continue
+			}
+
+			seasonStr := fmt.Sprintf("S%02d", season)
+			episodeStr := fmt.Sprintf("E%02d", episode)
+
+			fmt.Printf("   Found screen cap: Season %s, Episode %s, ID %s\n", seasonStr, episodeStr, result.Timestamp)
 
 			// Get the screen cap
-			screenCap, err := http.GetScreenCap(ctx, client, config, result.Season, result.Episode, result.ID)
+			screenCap, err := http.GetScreenCap(ctx, client, config, season, episode, result.Timestamp)
 			if err != nil {
 				fmt.Printf("   Error getting screen cap: %v\n", err)
 				continue
