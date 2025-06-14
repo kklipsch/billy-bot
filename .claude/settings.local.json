@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(go build:*)"
+      "Bash(go build:*)",
+      "Bash(go clean:*)",
+      "Bash(go mod:*)"
     ],
     "deny": []
   }

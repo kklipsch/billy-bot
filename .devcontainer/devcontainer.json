@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/go:1-bullseye",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
-			"version": "latest"
+			"version": "1.23.0"
 		},
 		"ghcr.io/devcontainers/features/git:1": {
 			"version": "latest",
