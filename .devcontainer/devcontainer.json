@@ -29,7 +29,8 @@
 				"ms-vscode.go",
 				"github.copilot",
 				"github.vscode-github-actions",
-				"github.vscode-pull-request-github"
+				"github.vscode-pull-request-github",
+				"vscodevim.vim"
 			]
 		}
 	},
