@@ -40,13 +40,6 @@ func main() {
 		kong.BindTo(ctx, (*context.Context)(nil)),
 	)
 
-	if cli.EnvFile != "" {
-		if err := godotenv.Load(cli.EnvFile); err != nil {
-			fmt.Printf("Error loading .env file: %v\n", err)
-			os.Exit(1)
-		}
-	}
-
 	// Set up logging configuration
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
@@ -64,6 +57,15 @@ func main() {
 		TimeFormat: "15:04:05",
 	}
 	log.Logger = log.Output(consoleWriter)
+
+	if cli.EnvFile != "" {
+		if _, err := os.Stat(cli.EnvFile); os.IsNotExist(err) {
+			log.Debug().Str("env_file", cli.EnvFile).Msg("Environment file does not exist, continuing without it")
+		} else if err := godotenv.Load(cli.EnvFile); err != nil {
+			fmt.Printf("Error loading .env file: %v\n", err)
+			os.Exit(1)
+		}
+	}
 
 	// Log the current configuration
 	log.Debug().

@@ -4,7 +4,14 @@
       "Bash(find:*)",
       "Bash(go build:*)",
       "Bash(go clean:*)",
-      "Bash(go mod:*)"
+      "Bash(go mod:*)",
+      "Edit(*.go)",
+      "Edit(*.md)",
+      "Edit(*.json)",
+      "Edit(*.yaml)",
+      "Edit(*.yml)",
+      "Edit(*.sh)",
+      "Edit(*.txt)"
     ],
     "deny": []
   }
