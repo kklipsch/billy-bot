@@ -8,9 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
-
-	"golang.org/x/net/html"
 )
 
 // Timestamp represents a Frinkiac timestamp as a string
@@ -84,22 +81,6 @@ func GetImagePath(episodeID EpisodeID, timestamp Timestamp) (string, error) {
 	}
 
 	return fmt.Sprintf("/img/%s/%s/medium.jpg", episodeID, timestamp), nil
-}
-
-// hasClass checks if a node has a specific class
-func hasClass(n *html.Node, class string) bool {
-	for _, attr := range n.Attr {
-		if attr.Key == "class" {
-			classes := strings.Fields(attr.Val)
-			for _, c := range classes {
-				if c == class {
-					return true
-				}
-			}
-			break
-		}
-	}
-	return false
 }
 
 // GetQuote searches for a quote on Frinkiac and returns the results
