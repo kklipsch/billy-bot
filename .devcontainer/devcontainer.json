@@ -9,6 +9,10 @@
 			"version": "latest",
 			"ppa": "false"
 		},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true"
+		},
 		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
 	},
 	"customizations": {
