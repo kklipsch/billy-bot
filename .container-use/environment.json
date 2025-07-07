@@ -1,0 +1,10 @@
+{
+  "workdir": "/workdir",
+  "base_image": "golang:1.23-alpine",
+  "setup_commands": [
+    "apk add --no-cache git"
+  ],
+  "env": [
+    "CGO_ENABLED=0"
+  ]
+}

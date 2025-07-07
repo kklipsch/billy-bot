@@ -9,21 +9,26 @@ import (
 	"github.com/kklipsch/billy-bot/pkg/frinkiac/http"
 )
 
-// Command represents the CLI command for OpenRouter
+// Command represents the CLI command group for Frinkiac
 type Command struct {
+	Complete CompleteCommand `cmd:"complete" help:"Find complete Simpsons scenes with quotes and screen captures."`
+}
+
+// CompleteCommand represents the complete subcommand for finding Simpsons scenes
+type CompleteCommand struct {
 	Prompt string `arg:"" help:"The prompt to send to the AI model."`
 	Model  string `default:"openrouter/auto" help:"The model to use."`
 	APIKey string `name:"api-key" short:"k" help:"OpenRouter API key. If not provided, OPENROUTER_API_KEY env var is used."`
 }
 
-// Run executes the OpenRouter command
-func (o *Command) Run(ctx context.Context) error {
-	apiKey, err := config.GetFlagOrEnvVar(o.APIKey, "OPENROUTER_API_KEY")
+// Run executes the complete command
+func (c *CompleteCommand) Run(ctx context.Context) error {
+	apiKey, err := config.GetFlagOrEnvVar(c.APIKey, "OPENROUTER_API_KEY")
 	if err != nil {
 		return err
 	}
 
-	quotes, err := ai.GetCandidateQuotes(ctx, o.Prompt, apiKey)
+	quotes, err := ai.GetCandidateQuotes(ctx, c.Prompt, apiKey)
 	if err != nil {
 		return err
 	}

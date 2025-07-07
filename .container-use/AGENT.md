@@ -1,0 +1,1 @@
+This environment has Go 1.23 installed. Use 'go build', 'go run', 'go test' commands to work with the Go codebase. The project uses Kong framework for CLI commands.
