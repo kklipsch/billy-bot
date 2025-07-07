@@ -17,7 +17,8 @@
       "mcp__container-use__environment_file_read",
       "mcp__container-use__environment_file_list",
       "mcp__container-use__environment_file_write",
-      "mcp__container-use__environment_run_cmd"
+      "mcp__container-use__environment_run_cmd",
+      "mcp__container-use__environment_checkpoint"
     ],
     "deny": []
   }
